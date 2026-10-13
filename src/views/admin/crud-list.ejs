@@ -1,0 +1,20 @@
+<%- include('../partials/admin-top') %>
+<div class="toolbar between"><span class="muted"><%= rows.length %> registro(s)</span><a href="/admin/<%= r.key %>/novo" class="btn btn-gold btn-sm">Adicionar</a></div>
+<div class="table-wrap"><table class="table">
+  <thead><tr><% r.columns.forEach(([, label]) => { %><th><%= label %></th><% }) %><th></th></tr></thead>
+  <tbody>
+    <% if (!rows.length) { %><tr><td colspan="<%= r.columns.length + 1 %>" class="muted">Nenhum registro.</td></tr><% } %>
+    <% rows.forEach((row) => { %>
+      <tr>
+        <% r.columns.forEach(([key, , fmt], i) => { const val = fmt ? fmt(row[key]) : row[key]; %>
+          <td><% if (i === 0) { %><a href="/admin/<%= r.key %>/<%= row.id %>"><%= val || '(sem título)' %></a><% } else { %><%= val == null ? '' : val %><% } %></td>
+        <% }) %>
+        <td class="nowrap">
+          <a class="btn btn-outline btn-sm" href="/admin/<%= r.key %>/<%= row.id %>">Editar</a>
+          <form method="post" action="/admin/<%= r.key %>/<%= row.id %>/excluir" class="inline-form" data-confirm="Excluir este registro?"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-outline btn-sm">Excluir</button></form>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table></div>
+<%- include('../partials/admin-bottom') %>

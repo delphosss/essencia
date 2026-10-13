@@ -1,0 +1,6 @@
+<% const _name = (locals.name || '?'); const _initials = _name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase(); %>
+<% if (locals.photo) { %>
+  <img class="avatar <%= locals.size || '' %>" src="<%= photo %>" alt="<%= _name %>" loading="lazy">
+<% } else { %>
+  <span class="avatar avatar-initials <%= locals.size || '' %>" aria-hidden="true"><%= _initials %></span>
+<% } %>

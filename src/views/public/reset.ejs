@@ -1,0 +1,12 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container narrow-sm">
+    <form method="post" action="/redefinir-senha/<%= token %>" class="form card card-body">
+      <h1 class="page-title left">Nova senha</h1>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <label class="field"><span>Nova senha (mín. 6 caracteres)</span><input class="input" type="password" name="password" required minlength="6"></label>
+      <button class="btn btn-gold btn-block">Salvar</button>
+    </form>
+  </div>
+</section>
+<%- include('../partials/footer') %>

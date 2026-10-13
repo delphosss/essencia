@@ -1,0 +1,18 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container">
+    <h1 class="page-title"><%= category ? category.name : 'Blog' %></h1>
+    <div class="chips center">
+      <a class="chip <%= !category ? 'active' : '' %>" href="/blog">Todos</a>
+      <% cats.forEach((c) => { %><a class="chip <%= category && category.id === c.id ? 'active' : '' %>" href="/blog/categoria/<%= c.slug %>"><%= c.name %></a><% }) %>
+    </div>
+    <% if (!posts.length) { %><p class="muted center">Nenhum artigo publicado ainda.</p><% } %>
+    <div class="grid grid-3"><% posts.forEach((p) => { %><%- include('../partials/post-card', { p }) %><% }) %></div>
+    <% if (pages > 1) { %>
+      <nav class="pagination">
+        <% for (let i = 1; i <= pages; i++) { %><a class="<%= i === page ? 'active' : '' %>" href="?pagina=<%= i %>"><%= i %></a><% } %>
+      </nav>
+    <% } %>
+  </div>
+</section>
+<%- include('../partials/footer') %>

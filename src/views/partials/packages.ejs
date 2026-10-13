@@ -1,0 +1,15 @@
+<% const bonus1 = settings.get('first_purchase_bonus_cents'); const ref = settings.get('default_price_chat_cents'); %>
+<div class="packages">
+  <% packages.forEach((p) => { const extra = p.bonus_cents + (locals.firstPurchase ? bonus1 : 0); const total = p.price_cents + extra; %>
+    <label class="package <%= p.badge ? 'package-featured' : '' %>">
+      <% if (locals.selectable) { %><input type="radio" name="package_id" value="<%= p.id %>" <%= locals.selected === p.id ? 'checked' : '' %> required><% } %>
+      <% if (p.badge) { %><span class="package-badge"><%= p.badge %></span><% } %>
+      <span class="package-price"><%= money(p.price_cents) %></span>
+      <% if (extra) { %><span class="package-bonus">+ <%= money(extra) %> de bônus<% if (locals.firstPurchase && bonus1) { %>*<% } %></span><% } %>
+      <span class="package-total"><%= money(total) %> em créditos</span>
+      <span class="muted small">≈ <%= Math.floor(total / ref) %> min de chat</span>
+      <% if (!locals.selectable) { %><a href="/comprar-creditos?pacote=<%= p.id %>" class="btn btn-gold btn-sm">Quero este</a><% } %>
+    </label>
+  <% }) %>
+</div>
+<% if (locals.firstPurchase && bonus1) { %><p class="muted small center">* Inclui <%= money(bonus1) %> de bônus da primeira compra. Minutos estimados com base em <%= money(ref) %>/min.</p><% } %>

@@ -1,0 +1,56 @@
+<%- include('../partials/admin-top') %>
+<div class="kpis">
+  <div class="kpi"><span>Vendas hoje</span><strong><%= money(kpi.salesToday) %></strong></div>
+  <div class="kpi"><span>Vendas no mês</span><strong><%= money(kpi.salesMonth) %></strong></div>
+  <div class="kpi"><span>Créditos vendidos (30 dias)</span><strong><%= money(kpi.creditsSold30) %></strong></div>
+  <div class="kpi"><span>Créditos consumidos (30 dias)</span><strong><%= money(kpi.consumed30) %></strong></div>
+  <div class="kpi"><span>Consultas (30 dias)</span><strong><%= kpi.consultations30.n %></strong><small><%= kpi.consultations30.m %> min</small></div>
+  <div class="kpi"><span>Chamadas perdidas (30 dias)</span><strong><%= kpi.missed30 %></strong></div>
+  <div class="kpi"><span>Novos clientes (30 dias)</span><strong><%= kpi.newClients30 %></strong></div>
+  <div class="kpi"><span>Saldo em carteiras</span><strong><%= money(kpi.walletTotal) %></strong></div>
+  <div class="kpi"><span>A pagar aos tarólogos</span><strong><%= money(kpi.payable) %></strong></div>
+  <div class="kpi"><span>Tarólogos online</span><strong data-online-count><%= kpi.readersOnline %></strong></div>
+</div>
+
+<div class="card card-body">
+  <h3>Vendas pagas — últimos 30 dias</h3>
+  <% const max = Math.max(1, ...days.map((d) => d.total)); %>
+  <div class="bars" role="img" aria-label="Gráfico de vendas diárias">
+    <% days.forEach((d) => { %>
+      <div class="bar" style="--h: <%= Math.round((d.total / max) * 100) %>%" title="<%= d.day.split('-').reverse().join('/') %>: <%= money(d.total) %>"><span></span></div>
+    <% }) %>
+  </div>
+  <div class="bars-axis muted small"><span><%= days[0].day.split('-').reverse().slice(0, 2).join('/') %></span><span>hoje</span></div>
+</div>
+
+<div class="grid grid-2">
+  <div class="card card-body">
+    <h3>Consultas ao vivo</h3>
+    <% if (!live.length) { %><p class="muted">Nenhuma consulta em andamento.</p><% } %>
+    <table class="table compact"><tbody>
+      <% live.forEach((s) => { %><tr><td><%= s.reader %></td><td><%= s.client %></td><td><%= fmtDuration(s.elapsedSeconds) %></td><td><%= money(s.chargedCents) %></td><td><a href="/sala/<%= s.code %>">ver</a></td></tr><% }) %>
+    </tbody></table>
+  </div>
+  <div class="card card-body">
+    <h3>Tarólogos</h3>
+    <table class="table compact"><tbody>
+      <% readers.forEach((r) => { %>
+        <tr data-reader-row="<%= r.id %>"><td><a href="/admin/tarologos/<%= r.id %>"><%= r.display_name %></a></td><td data-reader-status-cell><%- include('../partials/status-label', { s: r.status }) %></td></tr>
+      <% }) %>
+    </tbody></table>
+  </div>
+</div>
+
+<div class="grid grid-2">
+  <div class="card card-body">
+    <h3>Visitantes agora <span class="pill pill-ok" data-visitor-count>0</span></h3>
+    <table class="table compact"><thead><tr><th>Quem</th><th>Página</th><th>Desde</th></tr></thead><tbody data-visitors><tr><td colspan="3" class="muted">Carregando…</td></tr></tbody></table>
+  </div>
+  <div class="card card-body">
+    <h3>Últimos pedidos</h3>
+    <table class="table compact"><tbody>
+      <% lastOrders.forEach((o) => { %><tr><td><a href="/admin/pedidos/<%= o.id %>">#<%= o.id %></a></td><td><%= o.user_name %></td><td><%= money(o.total_cents) %></td><td><%- include('../partials/status-label', { s: o.status }) %></td></tr><% }) %>
+    </tbody></table>
+  </div>
+</div>
+<%- include('../partials/admin-bottom') %>

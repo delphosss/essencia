@@ -1,0 +1,50 @@
+<%- include('head') %>
+<body class="<%= locals.bodyClass || '' %>">
+<header class="topbar">
+  <div class="container topbar-inner">
+    <a href="/" class="logo" aria-label="<%= site.site_name %>">
+      <img src="/public/img/icon.svg" alt="" width="40" height="40">
+      <span><%= site.site_name %></span>
+    </a>
+    <div class="topbar-actions">
+      <% if (user) { %>
+        <% if (user.role === 'client') { %>
+          <a href="/comprar-creditos" class="credit-badge" title="Seu saldo">Crédito: <strong data-balance><%= money(user.balance_cents) %></strong></a>
+        <% } %>
+        <a href="<%= user.role === 'admin' ? '/admin' : user.role === 'reader' ? '/atendente' : '/minha-conta' %>" class="top-link">
+          <%= user.role === 'admin' ? 'Admin' : user.role === 'reader' ? 'Meu painel' : 'Minha conta' %>
+        </a>
+        <div class="bell-wrap">
+          <button type="button" class="bell" data-bell aria-label="Notificações">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5.5-6.84V3a1.5 1.5 0 0 0-3 0v1.16A7 7 0 0 0 5 11v5l-2 2v1h18v-1Z"/></svg>
+            <span class="bell-count" data-bell-count <%= unreadNotifications ? '' : 'hidden' %>><%= unreadNotifications %></span>
+          </button>
+          <div class="bell-panel" data-bell-panel hidden>
+            <div class="bell-head"><strong>Notificações</strong><button type="button" class="link" data-bell-readall>Marcar todas como lidas</button></div>
+            <ul class="bell-list" data-bell-list><li class="muted">Carregando…</li></ul>
+          </div>
+        </div>
+      <% } else { %>
+        <a href="/entrar" class="top-link">Entrar</a>
+        <a href="/cadastro" class="btn btn-gold btn-sm">Criar conta</a>
+      <% } %>
+      <a href="/carrinho" class="cart-link" aria-label="Carrinho">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM5.2 4l.6 3H21l-2 8H7.2L4.4 2H1v2Z"/></svg>
+        <span class="cart-count"><%= cartCount %></span>
+      </a>
+    </div>
+  </div>
+  <nav class="mainnav" aria-label="Principal">
+    <div class="container">
+      <button type="button" class="nav-toggle" data-nav-toggle aria-expanded="false">Menu</button>
+      <ul class="nav-list" data-nav>
+        <% const nav = [['/', 'Início'], ['/comprar-creditos', 'Comprar créditos'], ['/tarologos', 'Tarólogos'], ['/loja', 'Loja'], ['/blog', 'Blog'], ['/depoimentos', 'Depoimentos'], ['/perguntas-frequentes', 'Como consultar'], ['/contato', 'Contato']]; %>
+        <% nav.forEach(([href, label]) => { const active = href === '/' ? path === '/' : path.startsWith(href); %>
+          <li><a href="<%= href %>" class="<%= active ? 'active' : '' %>"><%= label %></a></li>
+        <% }) %>
+      </ul>
+    </div>
+  </nav>
+</header>
+<%- include('flash') %>
+<main>

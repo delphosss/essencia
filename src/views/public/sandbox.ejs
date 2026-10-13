@@ -1,0 +1,16 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container narrow">
+    <h1 class="page-title">Simulador de pagamento</h1>
+    <div class="alert alert-info">Este simulador só existe em desenvolvimento, quando o Mercado Pago não está configurado.</div>
+    <div class="card card-body center">
+      <p>Pedido #<%= order.id %> — <strong><%= money(order.total_cents) %></strong></p>
+      <form method="post" action="/pagamento/simulador/<%= order.id %>" class="toolbar center">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="btn btn-green" name="result" value="approve">Aprovar pagamento</button>
+        <button class="btn btn-outline" name="result" value="reject">Recusar</button>
+      </form>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

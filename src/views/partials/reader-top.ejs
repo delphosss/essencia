@@ -1,0 +1,27 @@
+<%- include('header', { bodyClass: 'reader-area' }) %>
+<section class="section section-tight">
+  <div class="container">
+    <div class="panel-head">
+      <div class="panel-who">
+        <%- include('avatar', { photo: reader.photo, name: reader.display_name, size: 'avatar-sm' }) %>
+        <div><strong><%= reader.display_name %></strong><br><a class="small" href="/tarologo/<%= reader.slug %>" target="_blank">Ver meu perfil público</a></div>
+      </div>
+      <div class="status-switch" data-reader-status="<%= reader.status %>">
+        <span class="muted small">Meu status:</span>
+        <%- include('status-label', { s: reader.status }) %>
+        <% if (reader.status === 'offline') { %>
+          <button type="button" class="btn btn-green btn-sm" data-set-status="online">Ficar online</button>
+        <% } else if (reader.status === 'online') { %>
+          <button type="button" class="btn btn-outline btn-sm" data-set-status="offline">Ficar offline</button>
+        <% } else { %>
+          <span class="muted small">em atendimento</span>
+        <% } %>
+      </div>
+    </div>
+    <% const items = [['/atendente', 'Painel'], ['/atendente/atendimentos', 'Atendimentos'], ['/atendente/perguntas', 'Perguntas'], ['/atendente/agenda', 'Agenda'], ['/atendente/financeiro', 'Financeiro'], ['/atendente/depoimentos', 'Depoimentos'], ['/mensagens', 'Mensagens'], ['/atendente/perfil', 'Meu perfil']]; %>
+    <nav class="subnav" aria-label="Painel do tarólogo">
+      <% items.forEach(([href, label]) => { const active = originalPath === href || (href !== '/atendente' && originalPath.startsWith(href + '/')); %>
+        <a href="<%= href %>" class="<%= active ? 'active' : '' %>"><%= label %></a>
+      <% }) %>
+      <form method="post" action="/sair" class="inline-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="link">Sair</button></form>
+    </nav>

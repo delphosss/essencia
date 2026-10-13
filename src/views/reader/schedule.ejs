@@ -1,0 +1,39 @@
+<%- include('../partials/reader-top') %>
+<div class="grid grid-2">
+  <form method="post" action="/atendente/agenda/janelas" class="form card card-body">
+    <h3>Abrir janela de disponibilidade</h3>
+    <p class="muted small">Horário de Brasília. O cliente escolhe uma janela e, se quiser, um horário dentro dela.</p>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label class="field"><span>Início</span><input class="input" type="datetime-local" name="starts_at" required></label>
+    <label class="field"><span>Fim</span><input class="input" type="datetime-local" name="ends_at" required></label>
+    <button class="btn btn-gold">Adicionar</button>
+  </form>
+  <div class="card card-body">
+    <h3>Janelas abertas</h3>
+    <% if (!slots.length) { %><p class="muted">Nenhuma janela futura.</p><% } %>
+    <ul class="plain">
+      <% slots.forEach((s) => { %>
+        <li class="toolbar between"><span><%= fmtDateTime(s.starts_at) %> → <%= fmtDateTime(s.ends_at) %></span>
+          <form method="post" action="/atendente/agenda/janelas/<%= s.id %>/remover" class="inline-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-outline btn-sm">Remover</button></form></li>
+      <% }) %>
+    </ul>
+  </div>
+</div>
+<h3>Agendamentos</h3>
+<div class="table-wrap"><table class="table">
+  <thead><tr><th>Data e hora</th><th>Cliente</th><th>Observações</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+    <% if (!appointments.length) { %><tr><td colspan="5" class="muted">Nenhum agendamento.</td></tr><% } %>
+    <% appointments.forEach((a) => { %>
+      <tr>
+        <td><%= fmtDateTime(a.scheduled_at) %></td><td><%= a.client_name %></td><td><%= a.notes %></td><td><%- include('../partials/status-label', { s: a.status }) %></td>
+        <td class="nowrap">
+          <% if (a.status === 'requested') { %><form method="post" action="/atendente/agenda/<%= a.id %>/confirmar" class="inline-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-green btn-sm">Confirmar</button></form><% } %>
+          <% if (a.status === 'confirmed') { %><form method="post" action="/atendente/agenda/<%= a.id %>/concluir" class="inline-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-outline btn-sm">Concluir</button></form><% } %>
+          <% if (['requested', 'confirmed'].includes(a.status)) { %><form method="post" action="/atendente/agenda/<%= a.id %>/cancelar" class="inline-form" data-prompt="Motivo do cancelamento (o cliente verá):" data-prompt-field="reason"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="reason"><button class="btn btn-outline btn-sm">Cancelar</button></form><% } %>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table></div>
+<%- include('../partials/reader-bottom') %>

@@ -1,0 +1,41 @@
+<%- include('../partials/admin-top') %>
+<a href="/admin/consultas" class="small">← Consultas</a>
+<div class="grid grid-2">
+  <div class="card card-body">
+    <h3><%= c.client_name %> × <%= c.reader_name %></h3>
+    <p><%- include('../partials/status-label', { s: c.status }) %> · <%= c.type %> · <%= money(c.price_per_min_cents) %>/min</p>
+    <p>Chamada: <%= fmtDateTime(c.called_at) %> · Aceita: <%= fmtDateTime(c.accepted_at) || '—' %> · Fim: <%= fmtDateTime(c.ended_at) || '—' %></p>
+    <p>Tempo faturável: <%= fmtDuration(c.billable_seconds) %> · Minutos cobrados: <%= c.minutes_charged %> · Total: <strong><%= money(c.charged_cents) %></strong></p>
+    <p>Saldo inicial: <%= c.balance_start_cents != null ? money(c.balance_start_cents) : '—' %> · Saldo final: <%= c.balance_end_cents != null ? money(c.balance_end_cents) : '—' %></p>
+    <p>Encerrada por: <%= c.ended_by || '—' %> · Motivo: <%= c.end_reason || c.reject_reason || '—' %></p>
+    <div class="toolbar">
+      <% if (c.status === 'active') { %>
+        <a class="btn btn-outline btn-sm" href="/sala/<%= c.code %>">Acompanhar sala</a>
+        <form method="post" action="/sala/<%= c.code %>/encerrar" class="inline-form" data-confirm="Encerrar esta consulta agora?"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-danger btn-sm">Encerrar consulta</button></form>
+      <% } %>
+    </div>
+    <% if (c.status === 'ended' && c.charged_cents > 0) { %>
+      <form method="post" action="/admin/consultas/<%= c.code %>/reembolso" class="form" data-confirm="Devolver créditos ao cliente?">
+        <h4>Devolver créditos</h4>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input class="input" name="amount" value="<%= centsToInput(c.charged_cents) %>">
+        <label class="check"><input type="checkbox" name="debit_reader" value="1" checked> Estornar também o repasse do tarólogo</label>
+        <button class="btn btn-outline btn-sm">Devolver</button>
+      </form>
+    <% } %>
+  </div>
+  <div class="card card-body">
+    <h3>Eventos da chamada</h3>
+    <table class="table compact"><tbody>
+      <% events.forEach((e) => { %><tr><td class="small"><%= fmtDateTime(e.created_at) %></td><td><%= e.event %></td><td class="mono small"><%= e.data || '' %></td></tr><% }) %>
+    </tbody></table>
+  </div>
+</div>
+<div class="card card-body">
+  <h3>Transcrição</h3>
+  <div class="chat-log static">
+    <% messages.forEach((m) => { %><div class="msg msg-<%= m.sender_role %>"><div class="msg-body"><%= m.body %></div><time><%= fmtDateTime(m.created_at).slice(-5) %></time></div><% }) %>
+    <% if (!messages.length) { %><p class="muted">Sem mensagens.</p><% } %>
+  </div>
+</div>
+<%- include('../partials/admin-bottom') %>

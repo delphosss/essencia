@@ -1,0 +1,22 @@
+<%- include('../partials/role-top') %>
+<a href="<%= back %>" class="small">← Voltar</a>
+<h1 class="page-title left">Pergunta #<%= q.id %> <%- include('../partials/status-label', { s: q.status }) %></h1>
+<p class="muted">Para <strong><%= q.reader_name %></strong> · de <strong><%= q.client_name %></strong> · <%= fmtDateTime(q.created_at) %> · <%= q.quantity %> pergunta(s) · <%= money(q.total_cents) %></p>
+<% if (q.people.length) { %>
+  <div class="card card-body"><h3>Pessoas envolvidas</h3><ul><% q.people.forEach((p) => { %><li><%= p.name %><%= p.birth_date ? ` — nascimento ${fmtDate(p.birth_date + 'T12:00:00Z')}` : '' %></li><% }) %></ul></div>
+<% } %>
+<div class="card card-body"><h3>Perguntas</h3><ol><% q.questions.forEach((t) => { %><li><%= t %></li><% }) %></ol></div>
+<% if (q.answer) { %>
+  <div class="card card-body answer"><h3>Resposta</h3><div class="prose"><%- nl2p(q.answer) %></div><span class="muted small">Respondida em <%= fmtDateTime(q.answered_at) %></span></div>
+<% } %>
+<% if (locals.canAnswer) { %>
+  <form method="post" action="/atendente/perguntas/<%= q.id %>" class="form card card-body">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label class="field"><span>Sua resposta</span><textarea class="input" name="answer" rows="10" required minlength="10"></textarea></label>
+    <button class="btn btn-gold">Enviar resposta</button>
+  </form>
+<% } %>
+<% if (locals.canRefund) { %>
+  <form method="post" action="/admin/perguntas/<%= q.id %>/reembolsar" data-confirm="Devolver o valor ao cliente?"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-outline">Reembolsar cliente</button></form>
+<% } %>
+<%- include('../partials/role-bottom') %>

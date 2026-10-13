@@ -1,0 +1,11 @@
+<%- include('../partials/admin-top') %>
+<% if (!rows.length) { %><p class="muted">Nenhuma mensagem.</p><% } %>
+<% rows.forEach((c) => { %>
+  <div class="card card-body <%= c.handled ? 'muted' : '' %>">
+    <div class="toolbar between"><strong><%= c.subject || '(sem assunto)' %></strong><span class="small"><%= fmtDateTime(c.created_at) %></span></div>
+    <p class="small"><%= c.name %> · <a href="mailto:<%= c.email %>"><%= c.email %></a> · <%= c.phone %></p>
+    <div class="prose"><%- nl2p(c.message) %></div>
+    <form method="post" action="/admin/contatos/<%= c.id %>" class="inline-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="handled" value="<%= c.handled ? '0' : '1' %>"><button class="btn btn-outline btn-sm"><%= c.handled ? 'Reabrir' : 'Marcar como respondido' %></button></form>
+  </div>
+<% }) %>
+<%- include('../partials/admin-bottom') %>

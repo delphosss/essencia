@@ -1,0 +1,90 @@
+</main>
+<footer class="footer">
+  <div class="container footer-grid">
+    <div>
+      <a href="/" class="logo logo-sm"><img src="/public/img/icon.svg" alt="" width="32" height="32"><span><%= site.site_name %></span></a>
+      <p class="muted"><%= site.site_tagline %></p>
+      <p class="muted small">Atendimento exclusivo para maiores de 18 anos. As consultas são orientações e não substituem acompanhamento profissional de saúde, jurídico ou financeiro.</p>
+    </div>
+    <div>
+      <h4>Institucional</h4>
+      <ul>
+        <li><a href="/quem-somos">Quem somos</a></li>
+        <li><a href="/perguntas-frequentes">Como consultar</a></li>
+        <li><a href="/trabalhe-conosco">Trabalhe conosco</a></li>
+        <li><a href="/termos-de-uso">Termos de uso</a></li>
+        <li><a href="/politica-de-privacidade">Privacidade</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Atendimento</h4>
+      <ul>
+        <li><a href="/contato">Fale conosco</a></li>
+        <% if (site.support_email) { %><li><a href="mailto:<%= site.support_email %>"><%= site.support_email %></a></li><% } %>
+        <% if (site.support_phone) { %><li><%= site.support_phone %></li><% } %>
+        <% if (site.instagram_url) { %><li><a href="<%= site.instagram_url %>" rel="noopener" target="_blank">Instagram</a></li><% } %>
+        <% if (site.facebook_url) { %><li><a href="<%= site.facebook_url %>" rel="noopener" target="_blank">Facebook</a></li><% } %>
+      </ul>
+    </div>
+    <div>
+      <h4>Pagamento seguro</h4>
+      <div class="pay-badges"><span>Pix</span><span>Cartão</span><span>PayPal</span></div>
+      <p class="muted small">Pagamentos processados por Mercado Pago e PayPal. Não armazenamos dados de cartão.</p>
+    </div>
+  </div>
+  <div class="container footer-bottom muted small">© <%= new Date().getFullYear() %> <%= site.site_name %>. Todos os direitos reservados.</div>
+</footer>
+
+<% if (site.support_whatsapp) { %>
+  <a class="wa-float" href="https://wa.me/<%= site.support_whatsapp.replace(/\D/g, '') %>" target="_blank" rel="noopener" aria-label="Suporte pelo WhatsApp">
+    <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.4.1.1.1.7-.1 1.3Z"/></svg>
+  </a>
+<% } %>
+
+<div class="cookie-bar" data-cookie-bar <%= cookiesAccepted ? 'hidden' : '' %>>
+  <p>Usamos cookies para melhorar sua experiência e medir o uso do site. Veja a <a href="/politica-de-privacidade">política de privacidade</a>.</p>
+  <button type="button" class="btn btn-gold btn-sm" data-cookie-accept>Aceitar</button>
+</div>
+
+<div class="modal" id="modal-purchase" hidden>
+  <div class="modal-box">
+    <h3>Compra aprovada!</h3>
+    <p>Seus créditos já estão disponíveis. Agora escolha com quem você quer conversar.</p>
+    <div class="modal-actions">
+      <a href="/tarologos" class="btn btn-gold">Escolher tarólogo</a>
+      <button type="button" class="btn btn-outline" data-close>Fechar</button>
+    </div>
+  </div>
+</div>
+
+<% if (user && user.role === 'reader') { %>
+  <div class="modal" id="modal-call" hidden>
+    <div class="modal-box call-box">
+      <div class="call-pulse"></div>
+      <h3>Nova chamada!</h3>
+      <p><strong data-call-client></strong> quer uma consulta por <strong data-call-type></strong>.</p>
+      <p class="muted small">Saldo do cliente: <span data-call-balance></span> · Expira em <span data-call-countdown></span></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-green" data-call-accept>Aceitar</button>
+        <button type="button" class="btn btn-outline" data-call-reject>Recusar</button>
+      </div>
+      <form class="call-reject-form" data-call-reject-form hidden>
+        <label class="field"><span>Motivo (o cliente verá)</span>
+          <select class="input" name="reason">
+            <option>Estou finalizando outro atendimento</option>
+            <option>Precisei me ausentar por alguns minutos</option>
+            <option>Não atendo esse tipo de assunto</option>
+          </select>
+        </label>
+        <button type="submit" class="btn btn-outline btn-sm">Confirmar recusa</button>
+      </form>
+    </div>
+  </div>
+<% } %>
+
+<div class="toasts" data-toasts aria-live="polite"></div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/public/js/app.js"></script>
+<% if (locals.scripts) { scripts.forEach((s) => { %><script src="<%= s %>"></script><% }) } %>
+</body>
+</html>

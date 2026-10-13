@@ -1,0 +1,38 @@
+<%- include('../partials/role-top') %>
+<h2 class="page-title left">Mensagens</h2>
+<div class="inbox">
+  <div>
+    <nav class="tabs">
+      <a class="tab <%= folderKey === 'entrada' ? 'active' : '' %>" href="/mensagens">Caixa de entrada</a>
+      <a class="tab <%= folderKey === 'enviadas' ? 'active' : '' %>" href="/mensagens?pasta=enviadas">Enviadas</a>
+      <a class="tab <%= folderKey === 'lixeira' ? 'active' : '' %>" href="/mensagens?pasta=lixeira">Lixeira</a>
+    </nav>
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th><%= folderKey === 'enviadas' ? 'Para' : 'De' %></th><th>Assunto</th><th>Data</th></tr></thead>
+      <tbody>
+        <% if (!messages.length) { %><tr><td colspan="3" class="muted">Nenhuma mensagem.</td></tr><% } %>
+        <% messages.forEach((m) => { %>
+          <tr class="<%= !m.read_at && folderKey !== 'enviadas' ? 'unread' : '' %>">
+            <td><%= folderKey === 'enviadas' ? (m.to_support ? 'Suporte' : m.recipient_name) : m.sender_name %></td>
+            <td><a href="/mensagens/<%= m.id %>"><%= m.subject %></a></td>
+            <td><%= fmtDateTime(m.created_at) %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table></div>
+  </div>
+  <form method="post" action="/mensagens" class="form card card-body">
+    <h3>Nova mensagem</h3>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label class="field"><span>Para</span>
+      <select class="input" name="to" required>
+        <% contacts.forEach((c) => { %><option value="<%= c.id %>" <%= String(c.id) === String(to) ? 'selected' : '' %>><%= c.label %></option><% }) %>
+      </select>
+    </label>
+    <label class="field"><span>Assunto</span><input class="input" name="subject" value="<%= subject %>" required maxlength="150"></label>
+    <label class="field"><span>Mensagem</span><textarea class="input" name="body" rows="6" required></textarea></label>
+    <% if (user.role !== 'admin') { %><p class="muted small">Dados de contato (telefone, e-mail, redes) são removidos automaticamente das mensagens entre clientes e tarólogos.</p><% } %>
+    <button class="btn btn-gold">Enviar</button>
+  </form>
+</div>
+<%- include('../partials/role-bottom') %>

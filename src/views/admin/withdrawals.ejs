@@ -1,0 +1,20 @@
+<%- include('../partials/admin-top') %>
+<div class="table-wrap"><table class="table">
+  <thead><tr><th>Data</th><th>Tarólogo</th><th>Valor</th><th>Chave Pix</th><th>Status</th><th>Ação</th></tr></thead>
+  <tbody>
+    <% if (!rows.length) { %><tr><td colspan="6" class="muted">Nenhum saque.</td></tr><% } %>
+    <% rows.forEach((w) => { %>
+      <tr><td><%= fmtDateTime(w.created_at) %></td><td><a href="/admin/tarologos/<%= w.reader_id %>"><%= w.display_name %></a></td><td><%= money(w.amount_cents) %></td><td class="mono"><%= w.pix_key %></td>
+      <td><%- include('../partials/status-label', { s: w.status === 'rejected' ? 'rejected' : w.status }) %><% if (w.admin_note) { %><br><span class="small muted"><%= w.admin_note %></span><% } %></td>
+      <td><% if (w.status === 'requested') { %>
+        <form method="post" action="/admin/saques/<%= w.id %>" class="toolbar">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <input class="input input-sm" name="note" placeholder="Obs. (ID do Pix)">
+          <button class="btn btn-green btn-sm" name="status" value="paid">Pago</button>
+          <button class="btn btn-outline btn-sm" name="status" value="rejected">Recusar</button>
+        </form>
+      <% } %></td></tr>
+    <% }) %>
+  </tbody>
+</table></div>
+<%- include('../partials/admin-bottom') %>

@@ -1,0 +1,5 @@
+<%- include('../partials/admin-top') %>
+<table class="table"><thead><tr><th>Página</th><th>Endereço</th><th>Atualizada</th></tr></thead><tbody>
+  <% pages.forEach((p) => { %><tr><td><a href="/admin/paginas/<%= p.slug %>"><%= p.title %></a></td><td><a href="/<%= p.slug %>" target="_blank">/<%= p.slug %></a></td><td><%= fmtDateTime(p.updated_at) %></td></tr><% }) %>
+</tbody></table>
+<%- include('../partials/admin-bottom') %>

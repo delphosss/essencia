@@ -1,0 +1,36 @@
+<%- include('../partials/client-top') %>
+<h1 class="page-title left">Meus dados</h1>
+<div class="grid grid-2">
+  <form method="post" action="/minha-conta/meus-dados" class="form card card-body">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label class="field"><span>Nome</span><input class="input" name="name" value="<%= user.name %>" required></label>
+    <label class="field"><span>E-mail</span><input class="input" value="<%= user.email %>" disabled></label>
+    <div class="row-2">
+      <label class="field"><span>Data de nascimento</span><input class="input" type="date" name="birth_date" value="<%= user.birth_date || '' %>"></label>
+      <label class="field"><span>CPF (opcional)</span><input class="input" name="cpf" value="<%= user.cpf || '' %>" inputmode="numeric"></label>
+    </div>
+    <div class="row-2">
+      <label class="field"><span>País</span><select class="input" name="country_code"><% countries.forEach(([c, n]) => { %><option value="<%= c %>" <%= user.country_code === c ? 'selected' : '' %>><%= n %></option><% }) %></select></label>
+      <label class="field"><span>CEP</span><input class="input" name="cep" value="<%= user.cep || '' %>" inputmode="numeric"></label>
+    </div>
+    <div class="row-phone">
+      <label class="field"><span>DDD</span><input class="input" name="area_code" value="<%= user.area_code || '' %>"></label>
+      <label class="field"><span>Telefone</span><input class="input" name="phone" value="<%= user.phone || '' %>"></label>
+    </div>
+    <label class="field"><span>Receber notificações por e-mail</span><select class="input" name="notify_opt_in"><option value="1" <%= user.notify_opt_in ? 'selected' : '' %>>Sim</option><option value="0" <%= user.notify_opt_in ? '' : 'selected' %>>Não</option></select></label>
+    <label class="field"><span>Como nos conheceu?</span>
+      <select class="input" name="referral_source">
+        <% ['', 'Instagram', 'Facebook', 'Google', 'Indicação', 'YouTube', 'TikTok', 'Outro'].forEach((o) => { %><option <%= user.referral_source === o ? 'selected' : '' %>><%= o %></option><% }) %>
+      </select>
+    </label>
+    <button class="btn btn-gold">Salvar</button>
+  </form>
+  <form method="post" action="/minha-conta/senha" class="form card card-body" id="senha">
+    <h3>Mudar senha</h3>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <% if (user.password_hash) { %><label class="field"><span>Senha atual</span><input class="input" type="password" name="current" required></label><% } %>
+    <label class="field"><span>Nova senha</span><input class="input" type="password" name="password" required minlength="6"></label>
+    <button class="btn btn-outline">Alterar senha</button>
+  </form>
+</div>
+<%- include('../partials/client-bottom') %>

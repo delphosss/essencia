@@ -1,0 +1,7 @@
+<% const items = [['/minha-conta', 'Resumo'], ['/minha-conta/meus-dados', 'Meus dados'], ['/minha-conta/compras', 'Compras'], ['/minha-conta/extrato', 'Extrato'], ['/minha-conta/atendimentos', 'Atendimentos'], ['/mensagens', 'Mensagens'], ['/minha-conta/perguntas', 'Perguntas'], ['/minha-conta/agendadas', 'Agendadas'], ['/minha-conta/depoimentos', 'Depoimentos'], ['/minha-conta/alertas', 'Avise-me'], ['/minha-conta/pedidos-loja', 'Pedidos loja']]; %>
+<nav class="subnav" aria-label="Minha conta">
+  <% items.forEach(([href, label]) => { const active = originalPath === href || (href !== '/minha-conta' && originalPath.startsWith(href + '/')); %>
+    <a href="<%= href %>" class="<%= active ? 'active' : '' %>"><%= label %></a>
+  <% }) %>
+  <form method="post" action="/sair" class="inline-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="link">Sair</button></form>
+</nav>

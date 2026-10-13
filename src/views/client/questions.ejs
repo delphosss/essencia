@@ -1,0 +1,13 @@
+<%- include('../partials/client-top') %>
+<h1 class="page-title left">Perguntas</h1>
+<p class="muted">Perguntas avulsas são respondidas por escrito. Para enviar uma nova, abra o perfil de um tarólogo e clique em "Enviar pergunta".</p>
+<div class="table-wrap"><table class="table">
+  <thead><tr><th>Tarólogo</th><th>Data</th><th>Qtd.</th><th>Valor</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+    <% if (!questions.length) { %><tr><td colspan="6" class="muted">Nenhuma pergunta enviada.</td></tr><% } %>
+    <% questions.forEach((x) => { %>
+      <tr><td><%= x.reader_name %></td><td><%= fmtDateTime(x.created_at) %></td><td><%= x.quantity %></td><td><%= money(x.total_cents) %></td><td><%- include('../partials/status-label', { s: x.status }) %></td><td><a class="btn btn-outline btn-sm" href="/minha-conta/perguntas/<%= x.id %>">Abrir</a></td></tr>
+    <% }) %>
+  </tbody>
+</table></div>
+<%- include('../partials/client-bottom') %>

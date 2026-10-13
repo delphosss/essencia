@@ -1,0 +1,26 @@
+<%- include('../partials/client-top') %>
+<h1 class="page-title left">Atendimentos</h1>
+<div class="table-wrap"><table class="table">
+  <thead><tr><th>Consultor</th><th>Data</th><th>Tipo</th><th>Duração</th><th>Crédito inicial</th><th>Crédito final</th><th>Status</th><th>Código</th><th></th></tr></thead>
+  <tbody>
+    <% if (!consultations.length) { %><tr><td colspan="9" class="muted">Nenhum atendimento ainda.</td></tr><% } %>
+    <% consultations.forEach((c) => { %>
+      <tr>
+        <td><a href="/tarologo/<%= c.reader_slug %>"><%= c.reader_name %></a></td>
+        <td><%= fmtDateTime(c.called_at) %></td>
+        <td><%= c.type === 'video' ? 'Vídeo' : 'Chat' %></td>
+        <td><%= c.minutes_charged %> min</td>
+        <td><%= c.balance_start_cents != null ? money(c.balance_start_cents) : '—' %></td>
+        <td><%= c.balance_end_cents != null ? money(c.balance_end_cents) : '—' %></td>
+        <td><%- include('../partials/status-label', { s: c.status }) %><% if (c.reject_reason) { %><br><span class="muted small"><%= c.reject_reason %></span><% } %></td>
+        <td class="mono small"><%= c.code.slice(0, 8) %></td>
+        <td class="nowrap">
+          <% if (c.status === 'active') { %><a class="btn btn-green btn-sm" href="/sala/<%= c.code %>">Voltar</a><% } %>
+          <% if (c.status === 'ended') { %><a class="btn btn-outline btn-sm" href="/minha-conta/atendimentos/<%= c.code %>">Conversa</a><% } %>
+          <% if (c.status === 'ended' && c.minutes_charged > 0 && !c.reviewed) { %><a class="btn btn-gold btn-sm" href="/minha-conta/avaliar/<%= c.code %>">Avaliar</a><% } %>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table></div>
+<%- include('../partials/client-bottom') %>

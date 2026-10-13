@@ -1,0 +1,21 @@
+<%- include('../partials/admin-top') %>
+<div class="tabs" data-tabs>
+  <button type="button" class="tab active" data-tab="events">Eventos de chamada</button>
+  <button type="button" class="tab" data-tab="outbox">E-mails e WhatsApp</button>
+  <button type="button" class="tab" data-tab="errors">Erros</button>
+</div>
+<div class="tab-panel" data-panel="events"><div class="table-wrap"><table class="table compact">
+  <thead><tr><th>Data</th><th>Consulta</th><th>Evento</th><th>Dados</th></tr></thead><tbody>
+  <% events.forEach((e) => { %><tr><td class="small"><%= fmtDateTime(e.created_at) %></td><td class="mono small"><% if (e.code) { %><a href="/admin/consultas/<%= e.code %>"><%= e.code.slice(0, 8) %></a><% } %></td><td><%= e.event %></td><td class="mono small"><%= e.data || '' %></td></tr><% }) %>
+</tbody></table></div></div>
+<div class="tab-panel" data-panel="outbox" hidden>
+  <p class="muted small">Últimas mensagens enviadas desde que o servidor iniciou.</p>
+  <div class="table-wrap"><table class="table compact"><thead><tr><th>Data</th><th>Canal</th><th>Para</th><th>Conteúdo</th></tr></thead><tbody>
+  <% outbox.forEach((m) => { %><tr><td class="small"><%= fmtDateTime(m.at) %></td><td><%= m.channel %></td><td class="small"><%= m.to %></td><td class="small"><%= m.subject ? `${m.subject} — ` : '' %><%= truncate(m.text, 200) %></td></tr><% }) %>
+  </tbody></table></div>
+</div>
+<div class="tab-panel" data-panel="errors" hidden><div class="table-wrap"><table class="table compact">
+  <thead><tr><th>Data</th><th>Origem</th><th>Mensagem</th></tr></thead><tbody>
+  <% errors.forEach((e) => { %><tr><td class="small"><%= fmtDateTime(e.created_at) %></td><td><%= e.source %></td><td class="mono small"><%= truncate(e.message, 400) %></td></tr><% }) %>
+</tbody></table></div></div>
+<%- include('../partials/admin-bottom') %>

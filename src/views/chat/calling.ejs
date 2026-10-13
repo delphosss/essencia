@@ -1,0 +1,21 @@
+<%- include('../partials/header', { bodyClass: 'calling-page' }) %>
+<section class="section">
+  <div class="container narrow center calling" data-calling="<%= c.code %>" data-status="<%= c.status %>" data-remaining="<%= remaining %>" data-timeout="<%= timeout %>" data-reader-slug="<%= r.slug %>">
+    <div class="calling-avatar"><%- include('../partials/avatar', { photo: r.photo, name: r.display_name, size: 'avatar-xl' }) %><span class="ring"></span></div>
+    <h1 class="page-title" data-calling-title><%= c.status === 'calling' ? `Chamando ${r.display_name}…` : 'Chamada encerrada' %></h1>
+    <p data-calling-text><%= c.status === 'calling' ? 'Aguarde: o tarólogo foi avisado e vai aceitar em instantes.' : '' %></p>
+    <div class="progress" <%= c.status === 'calling' ? '' : 'hidden' %>><div class="progress-bar" data-calling-bar></div></div>
+    <p class="muted small" data-calling-countdown></p>
+    <div class="toolbar center" data-calling-actions>
+      <% if (c.status === 'calling') { %>
+        <button type="button" class="btn btn-outline" data-calling-cancel>Cancelar chamada</button>
+      <% } %>
+    </div>
+    <div class="toolbar center" data-calling-after hidden>
+      <a class="btn btn-gold" href="/tarologos">Escolher outro tarólogo</a>
+      <button type="button" class="btn btn-outline" data-alert="<%= r.id %>">Avise-me quando disponível</button>
+      <a class="btn btn-outline" href="/tarologo/<%= r.slug %>#perguntar">Enviar pergunta</a>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer', { scripts: ['/public/js/calling.js'] }) %>

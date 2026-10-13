@@ -1,0 +1,20 @@
+<%- include('../partials/admin-top') %>
+<div class="toolbar">
+  <% [['pending', 'Aguardando'], ['approved', 'Publicados'], ['hidden', 'Ocultos']].forEach(([s, l]) => { %><a class="chip <%= status === s ? 'active' : '' %>" href="?status=<%= s %>"><%= l %></a><% }) %>
+</div>
+<div class="review-list">
+  <% if (!rows.length) { %><p class="muted">Nada por aqui.</p><% } %>
+  <% rows.forEach((v) => { %>
+    <div class="review-item">
+      <div><%- include('../partials/stars', { rating: v.rating }) %> <strong><%= v.reader_name %></strong> · <span class="muted">por <%= v.client_name %> em <%= fmtDateTime(v.created_at) %></span></div>
+      <p><%= v.body %></p>
+      <form method="post" action="/admin/depoimentos/<%= v.id %>" class="toolbar">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <% if (v.status !== 'approved') { %><button class="btn btn-green btn-sm" name="status" value="approved">Publicar</button><% } %>
+        <% if (v.status !== 'hidden') { %><button class="btn btn-outline btn-sm" name="status" value="hidden">Ocultar</button><% } %>
+        <button class="btn btn-danger btn-sm" name="status" value="delete" data-confirm-click="Excluir definitivamente?">Excluir</button>
+      </form>
+    </div>
+  <% }) %>
+</div>
+<%- include('../partials/admin-bottom') %>

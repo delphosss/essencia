@@ -1,0 +1,70 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container narrow">
+    <h1 class="page-title">Pagamento</h1>
+    <div class="card card-body checkout-summary">
+      <h3>Resumo do pedido #<%= order.id %></h3>
+      <p><%= description %></p>
+      <% if (items.length) { %>
+        <ul><% items.forEach((i) => { %><li><%= i.quantity %>× <%= i.name %> — <%= money(i.price_cents * i.quantity) %></li><% }) %></ul>
+      <% } %>
+      <dl class="totals">
+        <dt>Subtotal</dt><dd><%= money(order.subtotal_cents) %></dd>
+        <% if (order.discount_cents) { %><dt>Desconto<%= coupon ? ` (${coupon.code})` : '' %></dt><dd>− <%= money(order.discount_cents) %></dd><% } %>
+        <dt class="strong">Total a pagar</dt><dd class="strong"><%= money(order.total_cents) %></dd>
+        <% if (order.kind === 'credits') { %>
+          <% if (order.bonus_cents) { %><dt>Bônus</dt><dd>+ <%= money(order.bonus_cents) %></dd><% } %>
+          <dt>Créditos que você recebe</dt><dd class="gold"><%= money(order.credit_cents) %></dd>
+        <% } %>
+      </dl>
+      <% if (order.kind === 'credits') { %>
+        <form method="post" action="/pagamento/<%= order.id %>/cupom" class="toolbar">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <input class="input" name="coupon" placeholder="Cupom de desconto" value="<%= coupon ? coupon.code : '' %>">
+          <button class="btn btn-outline btn-sm">OK</button>
+        </form>
+      <% } %>
+    </div>
+
+    <% if (sandbox) { %><div class="alert alert-info">Modo de teste: nenhum pagamento real será feito. Configure o Mercado Pago no .env para produção.</div><% } %>
+
+    <div class="tabs" data-tabs>
+      <button type="button" class="tab active" data-tab="pix">Pix</button>
+      <button type="button" class="tab" data-tab="card">Cartão de crédito</button>
+      <% if (paypal) { %><button type="button" class="tab" data-tab="paypal">PayPal</button><% } %>
+    </div>
+
+    <div class="tab-panel card card-body" data-panel="pix">
+      <p>Pague com Pix e receba os créditos em poucos minutos, sem precisar enviar comprovante.</p>
+      <div class="pix-box" data-pix-box data-order="<%= order.id %>" <%= order.pix_qr ? '' : 'hidden' %>>
+        <img data-pix-img alt="QR Code Pix" <% if (order.pix_qr_base64) { %>src="data:image/png;base64,<%= order.pix_qr_base64 %>"<% } else { %>hidden<% } %>>
+        <label class="field"><span>Pix copia e cola</span><textarea class="input mono" rows="3" readonly data-pix-code><%= order.pix_qr || '' %></textarea></label>
+        <button type="button" class="btn btn-outline btn-sm" data-copy="[data-pix-code]">Copiar código</button>
+        <p class="muted small" data-pix-wait>Aguardando confirmação do pagamento…</p>
+        <% if (sandbox) { %><button type="button" class="btn btn-green btn-sm" data-sandbox-approve="<%= order.id %>">Simular pagamento aprovado</button><% } %>
+      </div>
+      <button type="button" class="btn btn-gold" data-pix-generate="<%= order.id %>" <%= order.pix_qr ? 'hidden' : '' %>>Gerar Pix</button>
+    </div>
+
+    <div class="tab-panel card card-body" data-panel="card" hidden>
+      <p>Você será levado ao ambiente seguro do Mercado Pago para pagar com cartão de crédito.</p>
+      <form method="post" action="/pagamento/<%= order.id %>/cartao">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="btn btn-gold">Pagar com cartão</button>
+      </form>
+      <div class="pay-badges"><span>Visa</span><span>Mastercard</span><span>Elo</span><span>Amex</span><span>Hipercard</span></div>
+    </div>
+
+    <% if (paypal) { %>
+    <div class="tab-panel card card-body" data-panel="paypal" hidden>
+      <p>Ideal para quem está fora do Brasil.</p>
+      <form method="post" action="<%= paypal.action %>">
+        <% Object.entries(paypal.fields).forEach(([k, v]) => { %><input type="hidden" name="<%= k %>" value="<%= v %>"><% }) %>
+        <button class="btn btn-gold">Pagar com PayPal</button>
+      </form>
+    </div>
+    <% } %>
+    <p class="muted small center">Este pedido fica salvo em <a href="/minha-conta/compras">Minha conta → Compras</a>, caso queira pagar depois.</p>
+  </div>
+</section>
+<%- include('../partials/footer', { scripts: ['/public/js/checkout.js'] }) %>

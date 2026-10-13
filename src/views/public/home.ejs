@@ -1,0 +1,110 @@
+<%- include('../partials/header') %>
+<section class="hero-slider" data-slider>
+  <% (banners.length ? banners : [{ title: site.site_name, subtitle: site.site_tagline, link: '/tarologos' }]).forEach((b, i) => { %>
+    <div class="slide <%= i === 0 ? 'active' : '' %>" <% if (b.image) { %>style="background-image:url('<%= b.image %>')"<% } %>>
+      <div class="container slide-content">
+        <% if (b.title) { %><h1><%= b.title %></h1><% } %>
+        <% if (b.subtitle) { %><p><%= b.subtitle %></p><% } %>
+        <% if (b.link) { %><a href="<%= b.link %>" class="btn btn-gold">Saiba mais</a><% } %>
+      </div>
+    </div>
+  <% }) %>
+  <% if (banners.length > 1) { %>
+    <button type="button" class="slider-prev" data-slide-prev aria-label="Anterior">‹</button>
+    <button type="button" class="slider-next" data-slide-next aria-label="Próximo">›</button>
+  <% } %>
+</section>
+
+<% if (top.length) { %>
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Mais procurados</h2>
+    <div class="top3">
+      <% top.forEach((r) => { %>
+        <a href="/tarologo/<%= r.slug %>" class="top3-item" data-reader-id="<%= r.id %>" data-status="<%= r.status %>">
+          <span class="top3-photo"><%- include('../partials/avatar', { photo: r.photo, name: r.display_name, size: 'avatar-md' }) %><span class="status-dot"></span></span>
+          <strong><%= r.display_name %></strong>
+          <span class="muted small"><%= truncate(r.oracles, 40) %></span>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<section class="section section-alt">
+  <div class="container value-prop">
+    <div>
+      <h2 class="section-title left">Converse com quem entende das cartas</h2>
+      <p>Escolha um tarólogo online e fale por <strong>chat ao vivo</strong>, pagando só pelos minutos que usar. Se preferir, envie uma <strong>pergunta avulsa</strong> com preço fixo e receba a resposta por escrito.</p>
+      <a href="/tarologos" class="btn btn-gold">Ver tarólogos online</a>
+    </div>
+    <ol class="steps">
+      <li><span>1</span><div><strong>Crie sua conta</strong><p class="muted">Leva menos de um minuto.</p></div></li>
+      <li><span>2</span><div><strong>Compre créditos</strong><p class="muted">Pix, cartão ou PayPal. <% if (firstPurchase && settings.get('first_purchase_bonus_cents')) { %>Bônus de <%= money(settings.get('first_purchase_bonus_cents')) %> na primeira compra.<% } %></p></div></li>
+      <li><span>3</span><div><strong>Escolha seu tarólogo</strong><p class="muted">Veja avaliações, especialidades e quem está online.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Especialidades</h2>
+    <div class="chips center">
+      <% categories.forEach((c) => { %><a class="chip" href="/categorias/<%= c.slug %>"><%= c.name %></a><% }) %>
+    </div>
+    <div class="reader-grid">
+      <% readers.forEach((r) => { %><%- include('../partials/reader-card', { r }) %><% }) %>
+    </div>
+    <div class="center"><a href="/tarologos" class="btn btn-outline">Ver todos os tarólogos</a></div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <h2 class="section-title">Pacotes de créditos</h2>
+    <%- include('../partials/packages', { packages, firstPurchase }) %>
+  </div>
+</section>
+
+<% if (reviews.length) { %>
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">O que dizem nossos clientes</h2>
+    <div class="review-strip">
+      <% reviews.forEach((v) => { %>
+        <figure class="review-card">
+          <%- include('../partials/stars', { rating: v.rating }) %>
+          <blockquote><%= truncate(v.body, 220) %></blockquote>
+          <figcaption class="muted small">Consulta com <a href="/tarologo/<%= v.reader_slug %>"><%= v.reader_name %></a> · <%= fmtDate(v.created_at) %></figcaption>
+        </figure>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<% if (posts.length) { %>
+<section class="section section-alt">
+  <div class="container">
+    <h2 class="section-title">Do nosso blog</h2>
+    <div class="grid grid-3">
+      <% posts.forEach((p) => { %><%- include('../partials/post-card', { p }) %><% }) %>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<% if (site.home_popup_enabled === '1' && site.home_popup_title) { %>
+  <div class="modal" id="modal-popup" data-popup hidden>
+    <div class="modal-box">
+      <h3><%= site.home_popup_title %></h3>
+      <p><%= site.home_popup_body %></p>
+      <div class="modal-actions">
+        <% if (site.home_popup_link) { %><a href="<%= site.home_popup_link %>" class="btn btn-gold">Quero aproveitar</a><% } %>
+        <button type="button" class="btn btn-outline" data-close>Agora não</button>
+      </div>
+    </div>
+  </div>
+<% } %>
+<%- include('../partials/footer') %>

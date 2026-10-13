@@ -1,0 +1,13 @@
+<%- include('../partials/client-top') %>
+<h1 class="page-title left">Extrato de créditos</h1>
+<p>Saldo atual: <strong data-balance><%= money(balance) %></strong></p>
+<div class="table-wrap"><table class="table">
+  <thead><tr><th>Data</th><th>Descrição</th><th>Valor</th><th>Saldo</th></tr></thead>
+  <tbody>
+    <% if (!rows.length) { %><tr><td colspan="4" class="muted">Nenhuma movimentação.</td></tr><% } %>
+    <% rows.forEach((t) => { %>
+      <tr><td><%= fmtDateTime(t.created_at) %></td><td><%= t.description %></td><td class="<%= t.amount_cents < 0 ? 'neg' : 'pos' %>"><%= money(t.amount_cents) %></td><td><%= money(t.balance_after_cents) %></td></tr>
+    <% }) %>
+  </tbody>
+</table></div>
+<%- include('../partials/client-bottom') %>

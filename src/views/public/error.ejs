@@ -1,0 +1,9 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container narrow center">
+    <h1 class="page-title"><%= status === 404 ? 'Página não encontrada' : 'Algo deu errado' %></h1>
+    <p><%= message %></p>
+    <a href="/" class="btn btn-gold">Voltar ao início</a>
+  </div>
+</section>
+<%- include('../partials/footer') %>

@@ -1,0 +1,26 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container narrow">
+    <h1 class="page-title">Fale conosco</h1>
+    <div class="grid grid-2">
+      <div class="card card-body">
+        <h3>Atendimento</h3>
+        <% if (site.support_whatsapp) { %><p>WhatsApp: <a href="https://wa.me/<%= site.support_whatsapp.replace(/\D/g, '') %>" target="_blank" rel="noopener"><%= site.support_whatsapp %></a></p><% } %>
+        <% if (site.support_phone) { %><p>Telefone: <%= site.support_phone %></p><% } %>
+        <% if (site.support_email) { %><p>E-mail: <a href="mailto:<%= site.support_email %>"><%= site.support_email %></a></p><% } %>
+        <p class="muted small">Clientes logados também podem falar com o suporte pela <a href="/mensagens">caixa de mensagens</a>.</p>
+      </div>
+      <form method="post" action="/contato" class="form card card-body">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <label class="field"><span>Nome *</span><input class="input" name="name" required value="<%= user ? user.name : '' %>"></label>
+        <label class="field"><span>E-mail *</span><input class="input" type="email" name="email" required value="<%= user ? user.email : '' %>"></label>
+        <label class="field"><span>Telefone *</span><input class="input" name="phone" required></label>
+        <label class="field"><span>Assunto</span><input class="input" name="subject"></label>
+        <label class="field"><span>Mensagem *</span><textarea class="input" name="message" rows="5" required></textarea></label>
+        <button class="btn btn-gold">Enviar</button>
+      </form>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

@@ -1,0 +1,34 @@
+<%- include('../partials/reader-top') %>
+<div class="kpis">
+  <div class="kpi"><span>Saldo total</span><strong><%= money(summary.balanceCents) %></strong></div>
+  <div class="kpi"><span>Em saque (aguardando)</span><strong><%= money(summary.heldCents) %></strong></div>
+  <div class="kpi"><span>Disponível</span><strong><%= money(summary.availableCents) %></strong></div>
+  <div class="kpi"><span>Ganhos no mês</span><strong><%= money(summary.monthCents) %></strong></div>
+  <div class="kpi"><span>Já recebido</span><strong><%= money(summary.paidOutCents) %></strong></div>
+</div>
+<div class="grid grid-2">
+  <form method="post" action="/atendente/financeiro/saque" class="form card card-body">
+    <h3>Solicitar saque</h3>
+    <p class="muted small">Seu repasse é de <strong><%= reader.commission_percent %>%</strong> do valor de cada consulta e pergunta. Saque mínimo: <%= money(minWithdrawal) %>. Pagamento por Pix após aprovação da administração.</p>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label class="field"><span>Valor (R$)</span><input class="input" name="amount" required inputmode="decimal" value="<%= centsToInput(summary.availableCents) %>"></label>
+    <label class="field"><span>Chave Pix</span><input class="input" name="pix_key" required value="<%= reader.pix_key || '' %>"></label>
+    <button class="btn btn-gold" <%= summary.availableCents < minWithdrawal ? 'disabled' : '' %>>Solicitar</button>
+  </form>
+  <div class="card card-body">
+    <h3>Saques</h3>
+    <% if (!withdrawals.length) { %><p class="muted">Nenhum saque solicitado.</p><% } %>
+    <table class="table compact"><tbody>
+      <% withdrawals.forEach((w) => { %><tr><td><%= fmtDate(w.created_at) %></td><td><%= money(w.amount_cents) %></td><td><%- include('../partials/status-label', { s: w.status === 'requested' ? 'requested' : w.status === 'paid' ? 'paid' : 'rejected' }) %></td><td class="muted small"><%= w.admin_note || '' %></td></tr><% }) %>
+    </tbody></table>
+  </div>
+</div>
+<h3>Extrato</h3>
+<div class="table-wrap"><table class="table">
+  <thead><tr><th>Data</th><th>Descrição</th><th>Bruto</th><th>%</th><th>Líquido</th></tr></thead>
+  <tbody>
+    <% if (!rows.length) { %><tr><td colspan="5" class="muted">Nenhum lançamento.</td></tr><% } %>
+    <% rows.forEach((e) => { %><tr><td><%= fmtDateTime(e.created_at) %></td><td><%= e.description %></td><td><%= e.gross_cents ? money(e.gross_cents) : '—' %></td><td><%= e.commission_percent || '—' %></td><td class="<%= e.net_cents < 0 ? 'neg' : 'pos' %>"><%= money(e.net_cents) %></td></tr><% }) %>
+  </tbody>
+</table></div>
+<%- include('../partials/reader-bottom') %>

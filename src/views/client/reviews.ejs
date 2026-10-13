@@ -1,0 +1,18 @@
+<%- include('../partials/client-top') %>
+<h1 class="page-title left">Meus depoimentos</h1>
+<% if (pending.length) { %>
+  <div class="card card-body">
+    <h3>Consultas para avaliar</h3>
+    <ul><% pending.forEach((p) => { %><li><%= p.reader_name %> — <%= fmtDate(p.ended_at) %> · <a href="/minha-conta/avaliar/<%= p.code %>">Avaliar</a></li><% }) %></ul>
+  </div>
+<% } %>
+<% if (!reviews.length) { %><p class="muted">Você ainda não enviou depoimentos.</p><% } %>
+<div class="review-list">
+  <% reviews.forEach((v) => { %>
+    <div class="review-item">
+      <div><%- include('../partials/stars', { rating: v.rating }) %> <a href="/tarologo/<%= v.reader_slug %>"><%= v.reader_name %></a> <%- include('../partials/status-label', { s: v.status }) %></div>
+      <p><%= v.body %></p><span class="muted small"><%= fmtDate(v.created_at) %></span>
+    </div>
+  <% }) %>
+</div>
+<%- include('../partials/client-bottom') %>

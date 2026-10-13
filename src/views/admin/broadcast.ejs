@@ -1,0 +1,13 @@
+<%- include('../partials/admin-top') %>
+<form method="post" action="/admin/notificacoes" class="form card card-body narrow">
+  <p class="muted">A notificação aparece no sino de cada usuário (e em tempo real para quem estiver no site).</p>
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <label class="field"><span>Para</span>
+    <select class="input" name="target"><option value="clients">Todos os clientes</option><option value="readers">Todos os tarólogos</option><option value="admins">Administradores</option><option value="all">Todos</option></select>
+  </label>
+  <label class="field"><span>Título</span><input class="input" name="title" required maxlength="120"></label>
+  <label class="field"><span>Mensagem</span><textarea class="input" name="body" rows="3" maxlength="500"></textarea></label>
+  <label class="field"><span>Link (opcional)</span><input class="input" name="link" placeholder="/comprar-creditos"></label>
+  <button class="btn btn-gold">Enviar</button>
+</form>
+<%- include('../partials/admin-bottom') %>

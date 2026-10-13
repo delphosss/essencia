@@ -1,0 +1,8 @@
+<%- include('../partials/reader-top') %>
+<% const avg = reviews.length ? (reviews.reduce((s, v) => s + v.rating, 0) / reviews.length).toFixed(1).replace('.', ',') : null; %>
+<p>Total publicado: <strong><%= reviews.length %></strong><% if (avg) { %> · Média: <strong>★ <%= avg %></strong><% } %></p>
+<div class="review-list">
+  <% if (!reviews.length) { %><p class="muted">Nenhum depoimento publicado ainda.</p><% } %>
+  <% reviews.forEach((v) => { %><div class="review-item"><%- include('../partials/stars', { rating: v.rating }) %><p><%= v.body %></p><span class="muted small"><%= fmtDate(v.created_at) %></span></div><% }) %>
+</div>
+<%- include('../partials/reader-bottom') %>

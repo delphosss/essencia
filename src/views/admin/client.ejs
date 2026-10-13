@@ -1,0 +1,39 @@
+<%- include('../partials/admin-top') %>
+<a href="/admin/clientes" class="small">← Clientes</a>
+<div class="grid grid-2">
+  <div class="card card-body">
+    <h3><%= u.name %></h3>
+    <p class="muted"><%= u.email %> · <%= u.area_code ? `(${u.area_code}) ` : '' %><%= u.phone %> · <%= u.country_code %></p>
+    <p>Nascimento: <%= u.birth_date ? fmtDate(u.birth_date + 'T12:00:00Z') : '—' %> · CPF: <%= u.cpf || '—' %> · Como conheceu: <%= u.referral_source || '—' %></p>
+    <p>Cadastro: <%= fmtDateTime(u.created_at) %> · Último login: <%= fmtDateTime(u.last_login_at) || '—' %></p>
+    <p class="balance-big">Saldo: <strong><%= money(u.balance_cents) %></strong></p>
+    <div class="toolbar">
+      <a class="btn btn-outline btn-sm" href="/mensagens?para=<%= u.id %>">Enviar mensagem</a>
+      <form method="post" action="/admin/clientes/<%= u.id %>/bloqueio" class="inline-form" data-confirm="<%= u.blocked ? 'Desbloquear' : 'Bloquear' %> este cliente?">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="blocked" value="<%= u.blocked ? '0' : '1' %>">
+        <button class="btn btn-<%= u.blocked ? 'outline' : 'danger' %> btn-sm"><%= u.blocked ? 'Desbloquear' : 'Bloquear' %></button>
+      </form>
+    </div>
+  </div>
+  <form method="post" action="/admin/clientes/<%= u.id %>/saldo" class="form card card-body">
+    <h3>Ajustar saldo</h3>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label class="field"><span>Valor (R$). Use valor negativo para debitar.</span><input class="input" name="amount" required></label>
+    <label class="field"><span>Motivo (aparece no extrato do cliente)</span><input class="input" name="reason" required placeholder="Ex.: compensação por queda de conexão"></label>
+    <label class="check"><input type="checkbox" name="notify" value="1" checked> Notificar o cliente</label>
+    <button class="btn btn-gold btn-sm">Lançar</button>
+  </form>
+</div>
+<div class="grid grid-2">
+  <div class="card card-body"><h3>Pedidos</h3><table class="table compact"><tbody>
+    <% orders.forEach((o) => { %><tr><td><a href="/admin/pedidos/<%= o.id %>">#<%= o.id %></a></td><td><%= fmtDate(o.created_at) %></td><td><%= money(o.total_cents) %></td><td><%- include('../partials/status-label', { s: o.status }) %></td></tr><% }) %>
+  </tbody></table></div>
+  <div class="card card-body"><h3>Consultas</h3><table class="table compact"><tbody>
+    <% consultations.forEach((c) => { %><tr><td><a href="/admin/consultas/<%= c.code %>"><%= c.reader_name %></a></td><td><%= fmtDate(c.called_at) %></td><td><%= c.minutes_charged %> min</td><td><%- include('../partials/status-label', { s: c.status }) %></td></tr><% }) %>
+  </tbody></table></div>
+</div>
+<div class="card card-body"><h3>Extrato da carteira</h3><div class="table-wrap"><table class="table compact">
+  <thead><tr><th>Data</th><th>Descrição</th><th>Valor</th><th>Saldo</th></tr></thead><tbody>
+  <% wallet.forEach((t) => { %><tr><td><%= fmtDateTime(t.created_at) %></td><td><%= t.description %></td><td class="<%= t.amount_cents < 0 ? 'neg' : 'pos' %>"><%= money(t.amount_cents) %></td><td><%= money(t.balance_after_cents) %></td></tr><% }) %>
+</tbody></table></div></div>
+<%- include('../partials/admin-bottom') %>

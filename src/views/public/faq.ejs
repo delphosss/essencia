@@ -1,0 +1,18 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container narrow">
+    <h1 class="page-title">Como consultar</h1>
+    <ol class="steps steps-row">
+      <li><span>1</span><div><strong>Cadastre-se</strong></div></li>
+      <li><span>2</span><div><strong>Compre créditos</strong></div></li>
+      <li><span>3</span><div><strong>Chame um tarólogo online</strong></div></li>
+    </ol>
+    <div class="faq">
+      <% faqs.forEach((f) => { %>
+        <details class="faq-item"><summary><%= f.question %></summary><div class="prose"><%- nl2p(f.answer) %></div></details>
+      <% }) %>
+    </div>
+    <p class="center"><a href="/tarologos" class="btn btn-gold">Escolher tarólogo</a></p>
+  </div>
+</section>
+<%- include('../partials/footer') %>

@@ -1,0 +1,17 @@
+<%- include('../partials/admin-top') %>
+<div class="review-list">
+  <% if (!rows.length) { %><p class="muted">Nenhum comentário.</p><% } %>
+  <% rows.forEach((c) => { %>
+    <div class="review-item">
+      <div><strong><%= c.name %></strong> <span class="muted small"><%= c.email %> · <%= fmtDateTime(c.created_at) %> · em <a href="/blog/<%= c.post_slug %>" target="_blank"><%= c.post_title %></a></span> <%- include('../partials/status-label', { s: c.status }) %></div>
+      <p><%= c.body %></p>
+      <form method="post" action="/admin/comentarios/<%= c.id %>" class="toolbar">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <% if (c.status !== 'approved') { %><button class="btn btn-green btn-sm" name="status" value="approved">Aprovar</button><% } %>
+        <% if (c.status !== 'hidden') { %><button class="btn btn-outline btn-sm" name="status" value="hidden">Ocultar</button><% } %>
+        <button class="btn btn-danger btn-sm" name="status" value="delete">Excluir</button>
+      </form>
+    </div>
+  <% }) %>
+</div>
+<%- include('../partials/admin-bottom') %>

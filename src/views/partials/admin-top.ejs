@@ -1,0 +1,42 @@
+<%- include('head') %>
+<body class="admin">
+<div class="admin-shell">
+  <aside class="admin-side" data-admin-side>
+    <a href="/admin" class="logo logo-sm"><img src="/public/img/icon.svg" alt="" width="28" height="28"><span><%= site.site_name %></span></a>
+    <% const pc = locals.pendingCounts || {}; const groups = [
+      ['Visão geral', [['/admin', 'Dashboard'], ['/admin/consultas', 'Consultas'], ['/admin/logs', 'Logs']]],
+      ['Pessoas', [['/admin/tarologos', 'Tarólogos'], ['/admin/clientes', 'Clientes'], ['/admin/candidaturas', 'Candidaturas', pc.applications], ['/mensagens', 'Mensagens', pc.messages], ['/admin/contatos', 'Fale conosco', pc.contacts]]],
+      ['Financeiro', [['/admin/pedidos', 'Pedidos'], ['/admin/saques', 'Saques', pc.withdrawals], ['/admin/pacotes', 'Pacotes'], ['/admin/cupons', 'Cupons']]],
+      ['Atendimento', [['/admin/perguntas', 'Perguntas pagas'], ['/admin/agendamentos', 'Agendamentos'], ['/admin/depoimentos', 'Depoimentos', pc.reviews], ['/admin/categorias', 'Categorias']]],
+      ['Conteúdo', [['/admin/banners', 'Banners'], ['/admin/paginas', 'Páginas'], ['/admin/faq', 'FAQ'], ['/admin/posts', 'Blog'], ['/admin/blog-categorias', 'Categorias do blog'], ['/admin/comentarios', 'Comentários', pc.comments], ['/admin/produtos', 'Produtos'], ['/admin/loja-categorias', 'Categorias da loja']]],
+      ['Sistema', [['/admin/notificacoes', 'Notificações'], ['/admin/configuracoes', 'Configurações']]],
+    ]; %>
+    <% groups.forEach(([g, links]) => { %>
+      <div class="side-group"><span><%= g %></span>
+        <% links.forEach(([href, label, n]) => { const active = originalPath === href || (href !== '/admin' && originalPath.startsWith(href + '/')); %>
+          <a href="<%= href %>" class="<%= active ? 'active' : '' %>"><%= label %><% if (n) { %><b class="side-count"><%= n %></b><% } %></a>
+        <% }) %>
+      </div>
+    <% }) %>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-bar">
+      <button type="button" class="nav-toggle" data-admin-toggle>Menu</button>
+      <h1><%= title %></h1>
+      <div class="toolbar">
+        <a href="/" target="_blank" class="btn btn-outline btn-sm">Ver site</a>
+        <div class="bell-wrap">
+          <button type="button" class="bell" data-bell aria-label="Notificações">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5.5-6.84V3a1.5 1.5 0 0 0-3 0v1.16A7 7 0 0 0 5 11v5l-2 2v1h18v-1Z"/></svg>
+            <span class="bell-count" data-bell-count <%= unreadNotifications ? '' : 'hidden' %>><%= unreadNotifications %></span>
+          </button>
+          <div class="bell-panel" data-bell-panel hidden>
+            <div class="bell-head"><strong>Notificações</strong><button type="button" class="link" data-bell-readall>Marcar todas como lidas</button></div>
+            <ul class="bell-list" data-bell-list></ul>
+          </div>
+        </div>
+        <form method="post" action="/sair" class="inline-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-outline btn-sm">Sair</button></form>
+      </div>
+    </header>
+    <%- include('flash') %>
+    <div class="admin-content">

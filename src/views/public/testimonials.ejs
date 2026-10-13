@@ -1,0 +1,21 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container">
+    <h1 class="page-title">Depoimentos</h1>
+    <% if (!reviews.length) { %><p class="muted center">Ainda não há depoimentos publicados.</p><% } %>
+    <div class="grid grid-3">
+      <% reviews.forEach((v) => { %>
+        <figure class="card card-body review-card">
+          <div class="review-reader">
+            <%- include('../partials/avatar', { photo: v.reader_photo, name: v.reader_name, size: 'avatar-sm' }) %>
+            <div><strong><%= v.reader_name %></strong><br><span class="muted small"><%= fmtDate(v.created_at) %></span></div>
+          </div>
+          <%- include('../partials/stars', { rating: v.rating }) %>
+          <blockquote><%= v.body %></blockquote>
+          <a class="btn btn-outline btn-sm" href="/tarologo/<%= v.reader_slug %>">Ver perfil</a>
+        </figure>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

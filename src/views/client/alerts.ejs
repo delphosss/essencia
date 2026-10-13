@@ -1,0 +1,14 @@
+<%- include('../partials/client-top') %>
+<h1 class="page-title left">Avise-me</h1>
+<p class="muted">Você recebe uma notificação (e um e-mail, se autorizou) quando o tarólogo ficar online.</p>
+<div class="table-wrap"><table class="table">
+  <thead><tr><th>Tarólogo</th><th>Status agora</th><th>Pedido em</th><th>Avisado em</th><th></th></tr></thead>
+  <tbody>
+    <% if (!alerts.length) { %><tr><td colspan="5" class="muted">Nenhum aviso.</td></tr><% } %>
+    <% alerts.forEach((a) => { %>
+      <tr><td><a href="/tarologo/<%= a.reader_slug %>"><%= a.reader_name %></a></td><td><%- include('../partials/status-label', { s: a.reader_status }) %></td><td><%= fmtDateTime(a.created_at) %></td><td><%= a.notified_at ? fmtDateTime(a.notified_at) : 'Aguardando' %></td>
+      <td><form method="post" action="/minha-conta/alertas/<%= a.id %>/remover" class="inline-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-outline btn-sm">Remover</button></form></td></tr>
+    <% }) %>
+  </tbody>
+</table></div>
+<%- include('../partials/client-bottom') %>

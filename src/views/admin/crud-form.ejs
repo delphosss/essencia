@@ -1,0 +1,31 @@
+<%- include('../partials/admin-top') %>
+<a href="/admin/<%= r.key %>" class="small">← <%= r.title %></a>
+<% const toLocal = (iso) => { if (!iso) return ''; const d = new Date(new Date(iso).getTime() - 3 * 3600 * 1000); return d.toISOString().slice(0, 16); }; %>
+<form method="post" action="/admin/<%= r.key %><%= isNew ? '' : `/${row.id}` %>" enctype="multipart/form-data" class="form card card-body">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <% r.fields.forEach((f) => { const v = row[f.name]; %>
+    <% if (f.type === 'checkbox') { %>
+      <label class="check"><input type="checkbox" name="<%= f.name %>" value="1" <%= v ? 'checked' : '' %>> <%= f.label %></label>
+    <% } else { %>
+      <label class="field"><span><%= f.label %><%= f.required ? ' *' : '' %></span>
+        <% if (f.type === 'textarea') { %><textarea class="input" name="<%= f.name %>" rows="4"><%= v || '' %></textarea>
+        <% } else if (f.type === 'html') { %><textarea class="input mono" name="<%= f.name %>" rows="14"><%= v || '' %></textarea>
+        <% } else if (f.type === 'money') { %><input class="input" name="<%= f.name %>" inputmode="decimal" value="<%= v === null || v === '' ? '' : centsToInput(v) %>">
+        <% } else if (f.type === 'number') { %><input class="input" type="number" name="<%= f.name %>" value="<%= v ?? '' %>">
+        <% } else if (f.type === 'datetime') { %><input class="input" type="datetime-local" name="<%= f.name %>" value="<%= toLocal(v) %>">
+        <% } else if (f.type === 'select') { %>
+          <select class="input" name="<%= f.name %>">
+            <% if (f.nullable) { %><option value="">—</option><% } %>
+            <% f.options().forEach(([val, label]) => { %><option value="<%= val %>" <%= String(v) === String(val) ? 'selected' : '' %>><%= label %></option><% }) %>
+          </select>
+        <% } else if (f.type === 'image') { %>
+          <% if (v) { %><img src="<%= v %>" alt="" class="thumb"><% } %><input class="input" type="file" name="<%= f.name %>" accept="image/*">
+        <% } else { %><input class="input" name="<%= f.name %>" value="<%= v || '' %>"><% } %>
+        <% if (f.help) { %><small class="muted"><%= f.help %></small><% } %>
+      </label>
+    <% } %>
+  <% }) %>
+  <% if (r.slugFrom && !isNew) { %><label class="field"><span>Slug (endereço)</span><input class="input" name="slug" value="<%= row.slug %>"></label><% } %>
+  <button class="btn btn-gold">Salvar</button>
+</form>
+<%- include('../partials/admin-bottom') %>

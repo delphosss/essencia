@@ -1,0 +1,32 @@
+<%- include('../partials/reader-top') %>
+<% if (active) { %>
+  <div class="alert alert-info">Você tem uma consulta <%= active.status === 'calling' ? 'chamando' : 'em andamento' %>. <a href="/sala/<%= active.code %>">Abrir sala</a></div>
+<% } %>
+<div class="card card-body sound-check" data-sound-check>
+  <strong>Alertas de chamada</strong>
+  <p class="muted small">Deixe esta aba aberta enquanto estiver online. Quando um cliente chamar, toca uma campainha por até <%= ringSeconds %> s e você tem alguns minutos para aceitar. Se tiver WhatsApp cadastrado no perfil, você também recebe o link de aceite por lá.</p>
+  <div class="toolbar">
+    <button type="button" class="btn btn-outline btn-sm" data-test-ring>Testar campainha</button>
+    <button type="button" class="btn btn-outline btn-sm" data-enable-notifications>Ativar notificações do navegador</button>
+  </div>
+</div>
+<div class="kpis">
+  <div class="kpi"><span>Atendimentos hoje</span><strong><%= stats.n %></strong></div>
+  <div class="kpi"><span>Minutos hoje</span><strong><%= stats.minutes %></strong></div>
+  <div class="kpi"><span>Ganhos no mês</span><strong><%= money(earnings.monthCents) %></strong></div>
+  <div class="kpi"><span>Disponível para saque</span><strong><%= money(earnings.availableCents) %></strong></div>
+  <div class="kpi"><span>Perguntas pendentes</span><strong><a href="/atendente/perguntas"><%= pendingQuestions %></a></strong></div>
+</div>
+<div class="grid grid-2">
+  <div class="card card-body">
+    <h3>Próximos agendamentos</h3>
+    <% if (!upcoming.length) { %><p class="muted">Nenhum agendamento. <a href="/atendente/agenda">Abrir janelas na agenda</a></p><% } %>
+    <ul class="plain"><% upcoming.forEach((a) => { %><li><%= fmtDateTime(a.scheduled_at) %> — <%= a.client_name %> <%- include('../partials/status-label', { s: a.status }) %></li><% }) %></ul>
+  </div>
+  <div class="card card-body">
+    <h3>Chamadas perdidas</h3>
+    <% if (!missed.length) { %><p class="muted">Nenhuma chamada perdida.</p><% } %>
+    <ul class="plain"><% missed.forEach((c) => { %><li><%= fmtDateTime(c.called_at) %> — <%= c.client_name %> · <a href="/mensagens?para=<%= c.client_id %>">mensagem</a></li><% }) %></ul>
+  </div>
+</div>
+<%- include('../partials/reader-bottom') %>

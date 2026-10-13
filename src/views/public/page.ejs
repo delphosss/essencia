@@ -1,0 +1,9 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container narrow">
+    <h1 class="page-title"><%= page.title %></h1>
+    <div class="prose card card-body"><%- page.body %></div>
+    <p class="muted small">Atualizado em <%= fmtDate(page.updated_at) %></p>
+  </div>
+</section>
+<%- include('../partials/footer') %>

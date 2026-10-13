@@ -1,0 +1,43 @@
+<%- include('../partials/client-top') %>
+<h1 class="page-title left">Minha conta</h1>
+<% if (active) { %>
+  <div class="alert alert-info">Você tem uma consulta <%= active.status === 'calling' ? 'aguardando o tarólogo' : 'em andamento' %>. <a href="<%= active.status === 'calling' ? `/chamando/${active.code}` : `/sala/${active.code}` %>">Voltar para a consulta</a></div>
+<% } %>
+<div class="grid grid-2">
+  <div class="card card-body">
+    <h3><%= user.name %></h3>
+    <p class="muted"><%= user.email %><br><%= user.area_code ? `(${user.area_code}) ` : '' %><%= user.phone %></p>
+    <p class="balance-big">Crédito disponível: <strong data-balance><%= money(balance) %></strong></p>
+    <div class="toolbar"><a href="/comprar-creditos" class="btn btn-gold btn-sm">Recarregar crédito</a><a href="/minha-conta/meus-dados#senha" class="btn btn-outline btn-sm">Mudar senha</a></div>
+  </div>
+  <div class="card card-body">
+    <h3>Acesso rápido</h3>
+    <div class="quick-grid">
+      <a href="/tarologos" class="btn btn-outline">Escolher tarólogo</a>
+      <a href="/loja" class="btn btn-outline">Ir para a loja</a>
+      <a href="/mensagens?para=support" class="btn btn-outline">Suporte</a>
+      <a href="/perguntas-frequentes" class="btn btn-outline">Dúvidas</a>
+    </div>
+    <div class="alert alert-warn small">Para sua segurança, não compartilhe dados de contato durante as consultas.</div>
+    <button type="button" class="btn btn-outline btn-sm" data-enable-notifications>Ativar notificações do navegador</button>
+  </div>
+</div>
+<div class="grid grid-2">
+  <div class="card card-body">
+    <h3>Últimas compras</h3>
+    <% if (!orders.length) { %><p class="muted">Nenhuma compra ainda.</p><% } %>
+    <table class="table compact"><tbody>
+      <% orders.forEach((o) => { %><tr><td>#<%= o.id %></td><td><%= fmtDate(o.created_at) %></td><td><%= money(o.total_cents) %></td><td><%- include('../partials/status-label', { s: o.status }) %></td></tr><% }) %>
+    </tbody></table>
+    <a href="/minha-conta/compras" class="small">Ver todas</a>
+  </div>
+  <div class="card card-body">
+    <h3>Últimos atendimentos</h3>
+    <% if (!consultations.length) { %><p class="muted">Nenhum atendimento ainda.</p><% } %>
+    <table class="table compact"><tbody>
+      <% consultations.forEach((c) => { %><tr><td><%= c.reader_name %></td><td><%= fmtDate(c.called_at) %></td><td><%= c.minutes_charged %> min</td><td><%- include('../partials/status-label', { s: c.status }) %></td></tr><% }) %>
+    </tbody></table>
+    <a href="/minha-conta/atendimentos" class="small">Ver todos</a>
+  </div>
+</div>
+<%- include('../partials/client-bottom') %>

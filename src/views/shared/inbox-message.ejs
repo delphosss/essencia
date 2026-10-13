@@ -1,0 +1,16 @@
+<%- include('../partials/role-top') %>
+<a href="/mensagens" class="small">← Mensagens</a>
+<div class="card card-body">
+  <h2><%= m.subject %></h2>
+  <p class="muted small">De <strong><%= m.sender_name %></strong> para <strong><%= m.to_support ? 'Suporte' : m.recipient_name %></strong> · <%= fmtDateTime(m.created_at) %></p>
+  <div class="prose"><%- nl2p(m.body) %></div>
+  <div class="toolbar">
+    <% if (m.isRecipient) { %><a class="btn btn-gold btn-sm" href="/mensagens?para=<%= m.sender_role === 'admin' && user.role !== 'admin' ? 'support' : m.sender_id %>&assunto=<%= encodeURIComponent('Re: ' + m.subject) %>">Responder</a><% } %>
+    <form method="post" action="/mensagens/<%= m.id %>/lixeira" class="inline-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <% if (m.isRecipient && m.recipient_deleted) { %><input type="hidden" name="restore" value="1"><button class="btn btn-outline btn-sm">Restaurar</button>
+      <% } else { %><button class="btn btn-outline btn-sm">Mover para a lixeira</button><% } %>
+    </form>
+  </div>
+</div>
+<%- include('../partials/role-bottom') %>

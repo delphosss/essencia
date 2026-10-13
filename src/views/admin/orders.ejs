@@ -1,0 +1,21 @@
+<%- include('../partials/admin-top') %>
+<div class="toolbar">
+  <% [['', 'Todos'], ['pending', 'Aguardando'], ['paid', 'Pagos'], ['failed', 'Falhos'], ['cancelled', 'Cancelados'], ['refunded', 'Estornados']].forEach(([s, l]) => { %>
+    <a class="chip <%= status === s ? 'active' : '' %>" href="?status=<%= s %>&tipo=<%= kind %>"><%= l %></a>
+  <% }) %>
+  <span class="muted">|</span>
+  <% [['', 'Créditos e loja'], ['credits', 'Créditos'], ['store', 'Loja']].forEach(([k, l]) => { %>
+    <a class="chip <%= kind === k ? 'active' : '' %>" href="?status=<%= status %>&tipo=<%= k %>"><%= l %></a>
+  <% }) %>
+</div>
+<div class="table-wrap"><table class="table">
+  <thead><tr><th>ID</th><th>Data</th><th>Cliente</th><th>Tipo</th><th>Total</th><th>Créditos</th><th>Método</th><th>Status</th><th>Ref. gateway</th></tr></thead>
+  <tbody>
+    <% rows.forEach((o) => { %>
+      <tr><td><a href="/admin/pedidos/<%= o.id %>">#<%= o.id %></a></td><td><%= fmtDateTime(o.created_at) %></td><td><a href="/admin/clientes/<%= o.user_id %>"><%= o.user_name %></a></td>
+      <td><%= o.kind === 'credits' ? (o.package_name || 'Créditos') : 'Loja' %></td><td><%= money(o.total_cents) %></td><td><%= o.kind === 'credits' ? money(o.credit_cents) : '—' %></td>
+      <td><%= o.method || '—' %></td><td><%- include('../partials/status-label', { s: o.status }) %></td><td class="mono small"><%= o.gateway_ref || '' %></td></tr>
+    <% }) %>
+  </tbody>
+</table></div>
+<%- include('../partials/admin-bottom') %>

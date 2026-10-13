@@ -1,0 +1,67 @@
+<%- include('../partials/admin-top') %>
+<% const v = values; const chk = (k) => (v[k] === '1' ? 'checked' : ''); %>
+<form method="post" action="/admin/configuracoes" class="form">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <div class="grid grid-2">
+    <fieldset class="card card-body fieldset"><legend>Site</legend>
+      <label class="field"><span>Nome do site</span><input class="input" name="site_name" value="<%= v.site_name %>"></label>
+      <label class="field"><span>Frase de apresentação</span><input class="input" name="site_tagline" value="<%= v.site_tagline %>"></label>
+      <label class="field"><span>Faixa promocional (lista de tarólogos)</span><input class="input" name="promo_strip" value="<%= v.promo_strip %>"></label>
+      <label class="field"><span>E-mail de suporte</span><input class="input" name="support_email" value="<%= v.support_email %>"></label>
+      <label class="field"><span>Telefone</span><input class="input" name="support_phone" value="<%= v.support_phone %>"></label>
+      <label class="field"><span>WhatsApp de suporte (com DDI, ex.: 5511999999999)</span><input class="input" name="support_whatsapp" value="<%= v.support_whatsapp %>"></label>
+      <label class="field"><span>Instagram (URL)</span><input class="input" name="instagram_url" value="<%= v.instagram_url %>"></label>
+      <label class="field"><span>Facebook (URL)</span><input class="input" name="facebook_url" value="<%= v.facebook_url %>"></label>
+    </fieldset>
+    <fieldset class="card card-body fieldset"><legend>Pop-up da home</legend>
+      <label class="check"><input type="checkbox" name="home_popup_enabled" value="1" <%= chk('home_popup_enabled') %>> Exibir pop-up (uma vez por visitante)</label>
+      <label class="field"><span>Título</span><input class="input" name="home_popup_title" value="<%= v.home_popup_title %>"></label>
+      <label class="field"><span>Texto</span><textarea class="input" name="home_popup_body" rows="3"><%= v.home_popup_body %></textarea></label>
+      <label class="field"><span>Link do botão</span><input class="input" name="home_popup_link" value="<%= v.home_popup_link %>"></label>
+      <h4>Rastreamento (carregado após o aceite de cookies)</h4>
+      <label class="field"><span>Google Analytics 4 (G-XXXX)</span><input class="input" name="ga4_id" value="<%= v.ga4_id %>"></label>
+      <label class="field"><span>Google Tag Manager (GTM-XXXX)</span><input class="input" name="gtm_id" value="<%= v.gtm_id %>"></label>
+      <label class="field"><span>Meta Pixel (ID)</span><input class="input" name="meta_pixel_id" value="<%= v.meta_pixel_id %>"></label>
+      <label class="field"><span>Microsoft Clarity (ID)</span><input class="input" name="clarity_id" value="<%= v.clarity_id %>"></label>
+    </fieldset>
+    <fieldset class="card card-body fieldset"><legend>Preços e créditos</legend>
+      <label class="field"><span>Bônus da primeira compra (R$)</span><input class="input" name="first_purchase_bonus_cents" value="<%= centsToInput(v.first_purchase_bonus_cents) %>"></label>
+      <label class="field"><span>Preço padrão do chat (R$/min) — novos tarólogos</span><input class="input" name="default_price_chat_cents" value="<%= centsToInput(v.default_price_chat_cents) %>"></label>
+      <label class="field"><span>Preço padrão do vídeo (R$/min)</span><input class="input" name="default_price_video_cents" value="<%= centsToInput(v.default_price_video_cents) %>"></label>
+      <label class="field"><span>Preço padrão da pergunta (R$)</span><input class="input" name="default_price_question_cents" value="<%= centsToInput(v.default_price_question_cents) %>"></label>
+      <label class="field"><span>Repasse padrão ao tarólogo (%)</span><input class="input" type="number" name="default_commission_percent" value="<%= v.default_commission_percent %>"></label>
+      <label class="field"><span>Saque mínimo (R$)</span><input class="input" name="withdrawal_min_cents" value="<%= centsToInput(v.withdrawal_min_cents) %>"></label>
+      <label class="field"><span>Saldo mínimo para iniciar (em minutos)</span><input class="input" type="number" name="min_balance_minutes" value="<%= v.min_balance_minutes %>"></label>
+      <label class="field"><span>Máximo de perguntas por envio</span><input class="input" type="number" name="question_max_per_order" value="<%= v.question_max_per_order %>"></label>
+      <label class="check"><input type="checkbox" name="readers_can_set_prices" value="1" <%= chk('readers_can_set_prices') %>> Tarólogos podem definir os próprios preços</label>
+    </fieldset>
+    <fieldset class="card card-body fieldset"><legend>Chamadas e sala</legend>
+      <label class="field"><span>Tempo para o tarólogo aceitar (segundos)</span><input class="input" type="number" name="call_timeout_seconds" value="<%= v.call_timeout_seconds %>"></label>
+      <label class="field"><span>Duração da campainha (segundos)</span><input class="input" type="number" name="ring_seconds" value="<%= v.ring_seconds %>"></label>
+      <label class="field"><span>Intervalo entre avisos por WhatsApp (segundos)</span><input class="input" type="number" name="whatsapp_repeat_seconds" value="<%= v.whatsapp_repeat_seconds %>"></label>
+      <label class="field"><span>Máximo de avisos por WhatsApp por chamada</span><input class="input" type="number" name="whatsapp_max_repeats" value="<%= v.whatsapp_max_repeats %>"></label>
+      <label class="field"><span>Aviso de saldo baixo (segundos restantes)</span><input class="input" type="number" name="low_balance_warning_seconds" value="<%= v.low_balance_warning_seconds %>"></label>
+      <label class="field"><span>Tolerância para reconexão (segundos)</span><input class="input" type="number" name="disconnect_grace_seconds" value="<%= v.disconnect_grace_seconds %>"></label>
+      <label class="field"><span>Pausa máxima (segundos)</span><input class="input" type="number" name="max_pause_seconds" value="<%= v.max_pause_seconds %>"></label>
+      <label class="field"><span>Tarólogo sem painel aberto fica offline após (segundos)</span><input class="input" type="number" name="reader_offline_grace_seconds" value="<%= v.reader_offline_grace_seconds %>"></label>
+      <label class="field"><span>Antecedência mínima para cancelar agendamento (horas)</span><input class="input" type="number" name="appointment_cancel_hours" value="<%= v.appointment_cancel_hours %>"></label>
+      <label class="field"><span>Servidor de vídeo (Jitsi)</span><input class="input" name="jitsi_domain" value="<%= v.jitsi_domain %>"></label>
+      <label class="check"><input type="checkbox" name="chat_block_contacts" value="1" <%= chk('chat_block_contacts') %>> Remover dados de contato das mensagens</label>
+      <label class="check"><input type="checkbox" name="reviews_require_approval" value="1" <%= chk('reviews_require_approval') %>> Depoimentos precisam de aprovação</label>
+      <label class="check"><input type="checkbox" name="comments_require_approval" value="1" <%= chk('comments_require_approval') %>> Comentários do blog precisam de aprovação</label>
+    </fieldset>
+  </div>
+  <button class="btn btn-gold">Salvar configurações</button>
+</form>
+<div class="card card-body">
+  <h3>Integrações (definidas no arquivo .env)</h3>
+  <ul class="plain">
+    <li>Mercado Pago: <%= env.mercadoPago.accessToken ? 'configurado' : 'não configurado (simulador ativo fora de produção)' %><%= env.mercadoPago.webhookSecret ? ' · assinatura do webhook ativa' : '' %></li>
+    <li>Webhook Mercado Pago: <code><%= env.baseUrl %>/webhooks/mercadopago</code></li>
+    <li>PayPal: <%= env.paypal.businessEmail ? `configurado (${env.paypal.sandbox ? 'sandbox' : 'produção'})` : 'não configurado' %> · IPN: <code><%= env.baseUrl %>/webhooks/paypal</code></li>
+    <li>Login com Google: <%= env.googleClientId ? 'configurado' : 'não configurado' %></li>
+    <li>E-mail (SMTP): <%= env.smtp.host ? env.smtp.host : 'não configurado (mensagens vão para o log)' %></li>
+    <li>WhatsApp: <%= env.whatsapp.url ? 'configurado' : 'não configurado (mensagens vão para o log)' %></li>
+  </ul>
+</div>
+<%- include('../partials/admin-bottom') %>

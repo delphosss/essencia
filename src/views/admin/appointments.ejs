@@ -1,0 +1,11 @@
+<%- include('../partials/admin-top') %>
+<div class="table-wrap"><table class="table">
+  <thead><tr><th>Data e hora</th><th>Cliente</th><th>Tarólogo</th><th>Status</th><th>Obs.</th><th></th></tr></thead>
+  <tbody>
+    <% rows.forEach((a) => { %>
+      <tr><td><%= fmtDateTime(a.scheduled_at) %></td><td><%= a.client_name %></td><td><%= a.reader_name %></td><td><%- include('../partials/status-label', { s: a.status }) %></td><td class="small"><%= a.notes %><%= a.cancel_reason ? ` · ${a.cancel_reason}` : '' %></td>
+      <td><% if (['requested', 'confirmed'].includes(a.status)) { %><form method="post" action="/admin/agendamentos/<%= a.id %>/cancelar" class="inline-form" data-confirm="Cancelar este agendamento?"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-outline btn-sm">Cancelar</button></form><% } %></td></tr>
+    <% }) %>
+  </tbody>
+</table></div>
+<%- include('../partials/admin-bottom') %>

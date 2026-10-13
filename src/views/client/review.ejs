@@ -1,0 +1,14 @@
+<%- include('../partials/client-top') %>
+<div class="narrow">
+  <h1 class="page-title left">Como foi sua consulta com <%= r.display_name %>?</h1>
+  <form method="post" action="/minha-conta/avaliar/<%= c.code %>" class="form card card-body">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <fieldset class="rating-input">
+      <legend>Sua nota</legend>
+      <% for (let i = 5; i >= 1; i--) { %><input type="radio" id="star<%= i %>" name="rating" value="<%= i %>" <%= i === 5 ? 'checked' : '' %>><label for="star<%= i %>" title="<%= ratingLabel(i) %>">★</label><% } %>
+    </fieldset>
+    <label class="field"><span>Seu depoimento</span><textarea class="input" name="body" rows="5" required minlength="5" maxlength="1500" placeholder="Conte como foi o atendimento (seu nome não aparece no site)."></textarea></label>
+    <button class="btn btn-gold">Enviar depoimento</button>
+  </form>
+</div>
+<%- include('../partials/client-bottom') %>

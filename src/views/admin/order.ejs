@@ -1,0 +1,41 @@
+<%- include('../partials/admin-top') %>
+<a href="/admin/pedidos" class="small">← Pedidos</a>
+<div class="grid grid-2">
+  <div class="card card-body">
+    <h3>Pedido #<%= order.id %> <%- include('../partials/status-label', { s: order.status }) %></h3>
+    <p>Cliente: <a href="/admin/clientes/<%= order.user_id %>"><%= order.user_name %></a> (<%= order.user_email %>)</p>
+    <p>Criado: <%= fmtDateTime(order.created_at) %> · Pago: <%= fmtDateTime(order.paid_at) || '—' %></p>
+    <dl class="totals">
+      <dt>Subtotal</dt><dd><%= money(order.subtotal_cents) %></dd>
+      <dt>Desconto</dt><dd><%= money(order.discount_cents) %></dd>
+      <dt class="strong">Total</dt><dd class="strong"><%= money(order.total_cents) %></dd>
+      <% if (order.kind === 'credits') { %><dt>Bônus</dt><dd><%= money(order.bonus_cents) %></dd><dt>Créditos</dt><dd><%= money(order.credit_cents) %></dd><% } %>
+      <dt>Método</dt><dd><%= order.method || '—' %></dd>
+      <dt>Ref. gateway</dt><dd class="mono small"><%= order.gateway_ref || '—' %></dd>
+    </dl>
+    <% if (items.length) { %><h4>Itens</h4><ul><% items.forEach((i) => { %><li><%= i.quantity %>× <%= i.name %> — <%= money(i.price_cents * i.quantity) %></li><% }) %></ul><% } %>
+    <% if (order.shipping_json) { %><p class="muted">Observações do cliente: <%= JSON.parse(order.shipping_json).notes %></p><% } %>
+  </div>
+  <div class="card card-body">
+    <h3>Ações</h3>
+    <% if (['pending', 'failed'].includes(order.status)) { %>
+      <form method="post" action="/admin/pedidos/<%= order.id %>/aprovar" class="form" data-confirm="Confirmar pagamento manual? Os créditos serão liberados.">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <label class="field"><span>Referência (comprovante, ID do link de pagamento)</span><input class="input" name="ref"></label>
+        <button class="btn btn-green btn-sm">Marcar como pago</button>
+      </form>
+      <form method="post" action="/admin/pedidos/<%= order.id %>/cancelar" class="inline-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-outline btn-sm">Cancelar pedido</button></form>
+    <% } %>
+    <% if (order.status === 'paid') { %>
+      <form method="post" action="/admin/pedidos/<%= order.id %>/estornar" class="inline-form" data-confirm="Estornar? Os créditos serão retirados da carteira do cliente. A devolução do dinheiro deve ser feita no painel do gateway.">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-danger btn-sm">Estornar</button>
+      </form>
+    <% } %>
+    <form method="post" action="/admin/pedidos/<%= order.id %>/nota" class="form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <label class="field"><span>Anotações internas</span><textarea class="input" name="notes" rows="3"><%= order.notes || '' %></textarea></label>
+      <button class="btn btn-outline btn-sm">Salvar anotação</button>
+    </form>
+  </div>
+</div>
+<%- include('../partials/admin-bottom') %>

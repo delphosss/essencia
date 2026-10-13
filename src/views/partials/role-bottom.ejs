@@ -1,0 +1,1 @@
+<% if (user.role === 'admin') { %><%- include('admin-bottom') %><% } else if (user.role === 'reader') { %><%- include('reader-bottom') %><% } else { %><%- include('client-bottom') %><% } %>

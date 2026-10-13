@@ -1,0 +1,22 @@
+<%- include('../partials/client-top') %>
+<h1 class="page-title left">Compras</h1>
+<div class="table-wrap"><table class="table">
+  <thead><tr><th>ID</th><th>Descrição</th><th>Valor</th><th>Créditos</th><th>Status</th><th>Método</th><th>Cód. pagamento</th><th>Data</th><th></th></tr></thead>
+  <tbody>
+    <% if (!orders.length) { %><tr><td colspan="9" class="muted">Nenhuma compra ainda.</td></tr><% } %>
+    <% orders.forEach((o) => { %>
+      <tr>
+        <td>#<%= o.id %></td>
+        <td><%= o.kind === 'credits' ? `Créditos (${o.package_name || 'pacote'})` : 'Loja' %></td>
+        <td><%= money(o.total_cents) %></td>
+        <td><%= o.kind === 'credits' ? money(o.credit_cents) : '—' %></td>
+        <td><%- include('../partials/status-label', { s: o.status }) %></td>
+        <td><%= { pix: 'Pix', card: 'Cartão', paypal: 'PayPal', manual: 'Manual', sandbox: 'Teste', coupon: 'Cupom' }[o.method] || '—' %></td>
+        <td class="mono small"><%= o.gateway_ref || '—' %></td>
+        <td><%= fmtDateTime(o.created_at) %></td>
+        <td><% if (o.status === 'pending') { %><a href="/pagamento/<%= o.id %>" class="btn btn-gold btn-sm">Pagar agora</a><% } %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table></div>
+<%- include('../partials/client-bottom') %>

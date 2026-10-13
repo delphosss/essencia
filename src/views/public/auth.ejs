@@ -1,0 +1,45 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container auth-grid">
+    <form method="post" action="/entrar" class="form card card-body <%= mode === 'login' ? 'auth-primary' : '' %>">
+      <h2>Já tenho conta</h2>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="next" value="<%= next %>">
+      <label class="field"><span>E-mail</span><input class="input" type="email" name="email" required autocomplete="email"></label>
+      <label class="field"><span>Senha</span><input class="input" type="password" name="password" required autocomplete="current-password"></label>
+      <button class="btn btn-gold btn-block">Entrar</button>
+      <a href="/esqueci-senha" class="small">Esqueci minha senha</a>
+      <% if (config.googleClientId) { %>
+        <div class="divider">ou</div>
+        <div id="g_id_onload" data-client_id="<%= config.googleClientId %>" data-login_uri="/auth/google" data-ux_mode="redirect" data-auto_prompt="false"></div>
+        <div class="g_id_signin" data-type="standard" data-text="continue_with" data-shape="pill"></div>
+      <% } %>
+    </form>
+    <form method="post" action="/cadastro" class="form card card-body <%= mode === 'register' ? 'auth-primary' : '' %>" data-register>
+      <h2>Quero me cadastrar</h2>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="next" value="<%= next %>">
+      <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <label class="field"><span>Nome completo *</span><input class="input" name="name" required autocomplete="name"></label>
+      <div class="row-2">
+        <label class="field"><span>Data de nascimento *</span><input class="input" type="date" name="birth_date" required></label>
+        <label class="field"><span>País *</span>
+          <select class="input" name="country_code" data-country>
+            <% countries.forEach(([code, name, ddi]) => { %><option value="<%= code %>" data-ddi="<%= ddi %>"><%= name %> (+<%= ddi %>)</option><% }) %>
+          </select>
+        </label>
+      </div>
+      <div class="row-phone">
+        <label class="field" data-ddd><span>DDD</span><input class="input" name="area_code" inputmode="numeric" maxlength="3"></label>
+        <label class="field"><span>Celular *</span><input class="input" name="phone" required inputmode="tel"></label>
+      </div>
+      <label class="field"><span>E-mail *</span><input class="input" type="email" name="email" required autocomplete="email"></label>
+      <label class="field"><span>Senha * (mín. 6 caracteres)</span><input class="input" type="password" name="password" required minlength="6" autocomplete="new-password"></label>
+      <label class="check"><input type="checkbox" name="notify_opt_in" value="1" checked> Quero receber avisos e promoções</label>
+      <label class="check"><input type="checkbox" name="terms" value="1" required> Tenho 18 anos ou mais e aceito os <a href="/termos-de-uso" target="_blank">termos</a> e a <a href="/politica-de-privacidade" target="_blank">privacidade</a></label>
+      <button class="btn btn-gold btn-block">Criar conta</button>
+    </form>
+  </div>
+</section>
+<% if (config.googleClientId) { %><script src="https://accounts.google.com/gsi/client" async></script><% } %>
+<%- include('../partials/footer') %>

@@ -1,0 +1,11 @@
+<%- include('../partials/role-top') %>
+<a href="<%= back %>" class="small">← Voltar</a>
+<h1 class="page-title left">Conversa <span class="mono small"><%= c.code.slice(0, 8) %></span></h1>
+<p class="muted"><%= c.reader_name || '' %><%= c.client_name ? ` · ${c.client_name}` : '' %> · <%= fmtDateTime(c.called_at) %> · <%= c.minutes_charged %> min · <%= money(c.charged_cents) %></p>
+<div class="chat-log static">
+  <% messages.forEach((m) => { %>
+    <div class="msg msg-<%= m.sender_role %>"><div class="msg-body"><%= m.body %></div><time><%= fmtDateTime(m.created_at).slice(-5) %></time></div>
+  <% }) %>
+  <% if (!messages.length) { %><p class="muted">Sem mensagens.</p><% } %>
+</div>
+<%- include('../partials/role-bottom') %>

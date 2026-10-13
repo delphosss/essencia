@@ -1,0 +1,8 @@
+<%- include('../partials/admin-top') %>
+<div class="table-wrap"><table class="table">
+  <thead><tr><th>Data</th><th>Cliente</th><th>Tarólogo</th><th>Qtd.</th><th>Valor</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+    <% rows.forEach((x) => { %><tr><td><%= fmtDateTime(x.created_at) %></td><td><%= x.client_name %></td><td><%= x.reader_name %></td><td><%= x.quantity %></td><td><%= money(x.total_cents) %></td><td><%- include('../partials/status-label', { s: x.status }) %></td><td><a href="/admin/perguntas/<%= x.id %>">abrir</a></td></tr><% }) %>
+  </tbody>
+</table></div>
+<%- include('../partials/admin-bottom') %>

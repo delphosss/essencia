@@ -1,0 +1,13 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container narrow-sm">
+    <form method="post" action="/esqueci-senha" class="form card card-body">
+      <h1 class="page-title left">Recuperar senha</h1>
+      <p class="muted">Informe o e-mail da sua conta. Enviaremos um link para você criar uma nova senha.</p>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <label class="field"><span>E-mail</span><input class="input" type="email" name="email" required></label>
+      <button class="btn btn-gold btn-block">Enviar link</button>
+    </form>
+  </div>
+</section>
+<%- include('../partials/footer') %>

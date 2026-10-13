@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title ? `${title} | ${site.site_name}` : site.site_name %></title>
+  <meta name="description" content="<%= description || site.site_tagline %>">
+  <meta name="csrf-token" content="<%= csrfToken %>">
+  <meta name="theme-color" content="#2a1245">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/public/img/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/public/css/style.css">
+  <script>
+    window.SITE = <%- JSON.stringify({
+      user: user ? { id: user.id, role: user.role, name: user.name } : null,
+      tracking: { ga4: site.ga4_id, gtm: site.gtm_id, pixel: site.meta_pixel_id, clarity: site.clarity_id },
+      cookiesAccepted: cookiesAccepted,
+    }).replace(/</g, '\\u003c') %>;
+  </script>
+</head>

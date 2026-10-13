@@ -1,0 +1,21 @@
+<%- include('../partials/admin-top') %>
+<p class="muted">Ao aprovar uma candidatura, cadastre o tarólogo em <a href="/admin/tarologos/novo">Tarólogos → Novo</a>.</p>
+<% if (!rows.length) { %><p class="muted">Nenhuma candidatura.</p><% } %>
+<% rows.forEach((a) => { %>
+  <details class="card card-body faq-item">
+    <summary><strong><%= a.professional_name %></strong> (<%= a.name %>) · <%= fmtDate(a.created_at) %> <%- include('../partials/status-label', { s: a.status }) %></summary>
+    <dl class="totals">
+      <dt>E-mail</dt><dd><%= a.email %></dd><dt>Telefone</dt><dd><%= a.phone %></dd><dt>Nascimento</dt><dd><%= a.birth_date %></dd>
+      <dt>Local</dt><dd><%= a.location %></dd><dt>Redes</dt><dd><%= a.social || '—' %></dd><dt>Experiência</dt><dd><%= a.experience %></dd>
+      <dt>Horários</dt><dd><%= a.schedule %></dd><dt>Oráculos</dt><dd><%= a.oracles %></dd>
+    </dl>
+    <div class="prose"><%- nl2p(a.profile) %></div>
+    <form method="post" action="/admin/candidaturas/<%= a.id %>" class="toolbar">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button class="btn btn-outline btn-sm" name="status" value="reviewing">Em análise</button>
+      <button class="btn btn-green btn-sm" name="status" value="approved">Aprovar</button>
+      <button class="btn btn-outline btn-sm" name="status" value="rejected">Recusar</button>
+    </form>
+  </details>
+<% }) %>
+<%- include('../partials/admin-bottom') %>

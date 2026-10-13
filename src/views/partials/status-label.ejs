@@ -1,0 +1,8 @@
+<% const labels = {
+  pending: ['Aguardando', 'warn'], paid: ['Pago', 'ok'], cancelled: ['Cancelado', 'muted'], refunded: ['Estornado', 'muted'], failed: ['Falhou', 'bad'],
+  calling: ['Chamando', 'warn'], active: ['Em andamento', 'ok'], ended: ['Concluída', 'ok'], rejected: ['Recusada', 'bad'], missed: ['Perdida', 'bad'],
+  answered: ['Respondida', 'ok'], requested: ['Solicitado', 'warn'], confirmed: ['Confirmado', 'ok'], done: ['Realizado', 'ok'],
+  approved: ['Aprovado', 'ok'], hidden: ['Oculto', 'muted'], new: ['Nova', 'warn'], reviewing: ['Em análise', 'warn'],
+  online: ['Online', 'ok'], busy: ['Ocupado', 'warn'], offline: ['Offline', 'muted'],
+}; const l = labels[locals.s] || [locals.s, 'muted']; %>
+<span class="pill pill-<%= l[1] %>"><%= l[0] %></span>

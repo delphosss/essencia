@@ -1,0 +1,16 @@
+<%- include('../partials/admin-top') %>
+<div class="toolbar">
+  <% [['', 'Todas'], ['active', 'Em andamento'], ['calling', 'Chamando'], ['ended', 'Concluídas'], ['missed', 'Perdidas'], ['rejected', 'Recusadas'], ['cancelled', 'Canceladas']].forEach(([s, l]) => { %>
+    <a class="chip <%= status === s ? 'active' : '' %>" href="/admin/consultas<%= s ? `?status=${s}` : '' %>"><%= l %></a>
+  <% }) %>
+</div>
+<div class="table-wrap"><table class="table">
+  <thead><tr><th>Código</th><th>Data</th><th>Cliente</th><th>Tarólogo</th><th>Tipo</th><th>Min</th><th>Cobrado</th><th>Status</th><th>Motivo</th></tr></thead>
+  <tbody>
+    <% rows.forEach((c) => { %>
+      <tr><td class="mono small"><a href="/admin/consultas/<%= c.code %>"><%= c.code.slice(0, 8) %></a></td><td><%= fmtDateTime(c.called_at) %></td><td><%= c.client_name %></td><td><%= c.reader_name %></td>
+      <td><%= c.type %></td><td><%= c.minutes_charged %></td><td><%= money(c.charged_cents) %></td><td><%- include('../partials/status-label', { s: c.status }) %></td><td class="small"><%= c.end_reason || c.reject_reason || '' %></td></tr>
+    <% }) %>
+  </tbody>
+</table></div>
+<%- include('../partials/admin-bottom') %>

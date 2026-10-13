@@ -1,0 +1,29 @@
+<% const r = locals.r; %>
+<article class="reader-card" data-reader-id="<%= r.id %>" data-status="<%= r.status %>">
+  <a href="/tarologo/<%= r.slug %>" class="reader-card-photo">
+    <%- include('avatar', { photo: r.photo, name: r.display_name, size: 'avatar-lg' }) %>
+  </a>
+  <h3 class="reader-card-name"><a href="/tarologo/<%= r.slug %>"><%= r.display_name %></a></h3>
+  <span class="status-badge" data-status-badge></span>
+  <div class="reader-card-time muted small" data-busy-time></div>
+  <div class="muted small">Depoimentos: <%= r.review_count || 0 %><% if (r.rating_avg) { %> · ★ <%= String(r.rating_avg).replace('.', ',') %><% } %></div>
+  <p class="reader-card-oracles"><%= truncate(r.oracles, 60) %></p>
+  <p class="reader-card-bio"><%= truncate(r.bio, 130) %></p>
+  <div class="reader-card-prices">
+    <% if (r.chat_enabled) { %><span><%= money(r.price_chat_cents) %> / min chat</span><% } %>
+    <% if (r.video_enabled) { %><span><%= money(r.price_video_cents) %> / min vídeo</span><% } %>
+  </div>
+  <div class="reader-card-actions" data-when="online">
+    <% if (r.chat_enabled) { %><button type="button" class="btn btn-green btn-sm" data-consult="<%= r.id %>" data-type="chat">Chat</button><% } %>
+    <% if (r.video_enabled) { %><button type="button" class="btn btn-green btn-sm" data-consult="<%= r.id %>" data-type="video">Vídeo</button><% } %>
+    <% if (r.questions_enabled) { %><a href="/tarologo/<%= r.slug %>#perguntar" class="btn btn-outline btn-sm">Perguntar</a><% } %>
+  </div>
+  <div class="reader-card-actions" data-when="busy">
+    <button type="button" class="btn btn-disabled btn-sm" disabled>Ocupado</button>
+    <button type="button" class="btn btn-outline btn-sm" data-alert="<%= r.id %>">Avise-me</button>
+  </div>
+  <div class="reader-card-actions" data-when="offline">
+    <button type="button" class="btn btn-outline btn-sm" data-alert="<%= r.id %>">Avise-me</button>
+    <% if (r.questions_enabled) { %><a href="/tarologo/<%= r.slug %>#perguntar" class="btn btn-outline btn-sm">Perguntar</a><% } %>
+  </div>
+</article>

@@ -1,0 +1,16 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container">
+    <h1 class="page-title"><%= category ? category.name : 'Consulta de tarot online' %></h1>
+    <% if (site.promo_strip) { %><div class="promo-strip"><%= site.promo_strip %></div><% } %>
+    <div class="chips">
+      <a class="chip <%= !category ? 'active' : '' %>" href="/tarologos">Todos</a>
+      <% categories.forEach((c) => { %><a class="chip <%= category && category.id === c.id ? 'active' : '' %>" href="/categorias/<%= c.slug %>"><%= c.name %></a><% }) %>
+    </div>
+    <% if (!readers.length) { %><p class="muted center">Nenhum tarólogo nesta categoria por enquanto.</p><% } %>
+    <div class="reader-grid">
+      <% readers.forEach((r) => { %><%- include('../partials/reader-card', { r }) %><% }) %>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

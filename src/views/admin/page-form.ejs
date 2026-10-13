@@ -1,0 +1,9 @@
+<%- include('../partials/admin-top') %>
+<a href="/admin/paginas" class="small">← Páginas</a>
+<form method="post" action="/admin/paginas/<%= page.slug %>" class="form card card-body">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <label class="field"><span>Título</span><input class="input" name="title" value="<%= page.title %>" required></label>
+  <label class="field"><span>Conteúdo (HTML)</span><textarea class="input mono" name="body" rows="22"><%= page.body %></textarea></label>
+  <button class="btn btn-gold">Salvar</button>
+</form>
+<%- include('../partials/admin-bottom') %>

@@ -1,0 +1,22 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container narrow">
+    <h1 class="page-title">Comprar créditos</h1>
+    <p class="center muted">Os créditos ficam na sua conta e são usados nas consultas por chat, vídeo e perguntas. Eles não expiram.</p>
+    <% if (firstPurchase && firstBonus) { %><div class="promo-strip">Primeira compra: você ganha <strong><%= money(firstBonus) %></strong> de bônus em qualquer pacote.</div><% } %>
+    <form method="post" action="/comprar" class="form" data-buy-form>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <%- include('../partials/packages', { packages, firstPurchase, selectable: true, selected }) %>
+      <label class="field coupon-field"><span>Cupom de desconto (opcional)</span><input class="input" name="coupon" autocomplete="off" placeholder="Digite o código"></label>
+      <% if (user && user.role === 'client') { %>
+        <button class="btn btn-gold btn-block">Pagar e consultar</button>
+      <% } else if (user) { %>
+        <p class="muted center">A compra de créditos é feita com uma conta de cliente.</p>
+      <% } else { %>
+        <a href="/entrar?next=/comprar-creditos" class="btn btn-gold btn-block">Entre para comprar</a>
+      <% } %>
+    </form>
+    <p class="muted small center">Formas de pagamento: Pix, cartão de crédito e PayPal. Não encontrou a sua? <a href="/contato">Fale com a gente</a>.</p>
+  </div>
+</section>
+<%- include('../partials/footer') %>

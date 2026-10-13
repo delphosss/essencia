@@ -1,0 +1,65 @@
+<%- include('../partials/admin-top') %>
+<a href="/admin/tarologos" class="small">← Tarólogos</a>
+<form method="post" action="/admin/tarologos<%= isNew ? '' : `/${r.id}` %>" enctype="multipart/form-data" class="form card card-body">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <h3>Acesso</h3>
+  <div class="row-3">
+    <label class="field"><span>E-mail de login *</span><input class="input" type="email" name="email" value="<%= u.email || '' %>" required></label>
+    <label class="field"><span>Nome civil</span><input class="input" name="legal_name" value="<%= u.name || '' %>"></label>
+    <label class="field"><span><%= isNew ? 'Senha inicial *' : 'Nova senha (deixe vazio para manter)' %></span><input class="input" type="password" name="password" <%= isNew ? 'required minlength=6' : '' %>></label>
+  </div>
+  <h3>Perfil público</h3>
+  <div class="row-2">
+    <div>
+      <label class="field"><span>Nome artístico *</span><input class="input" name="display_name" value="<%= r.display_name || '' %>" required></label>
+      <label class="field"><span>Endereço do perfil (slug)</span><input class="input" name="slug" value="<%= r.slug || '' %>" placeholder="gerado a partir do nome"></label>
+      <label class="field"><span>Oráculos</span><input class="input" name="oracles" value="<%= r.oracles || '' %>"></label>
+      <div class="field"><span>Foto</span><%- include('../partials/avatar', { photo: r.photo, name: r.display_name || '?', size: 'avatar-lg' }) %><input class="input" type="file" name="photo" accept="image/*"></div>
+    </div>
+    <label class="field"><span>Apresentação</span><textarea class="input" name="bio" rows="12"><%= r.bio || '' %></textarea></label>
+  </div>
+  <fieldset class="fieldset"><legend>Especialidades</legend>
+    <div class="check-grid"><% categories.forEach((c) => { %><label class="check"><input type="checkbox" name="categories" value="<%= c.id %>" <%= selected.includes(c.id) ? 'checked' : '' %>> <%= c.name %></label><% }) %></div>
+  </fieldset>
+  <h3>Atendimento e preços</h3>
+  <div class="row-3">
+    <label class="field"><span>Chat (R$/min)</span><input class="input" name="price_chat" value="<%= centsToInput(r.price_chat_cents) %>"></label>
+    <label class="field"><span>Vídeo (R$/min)</span><input class="input" name="price_video" value="<%= centsToInput(r.price_video_cents) %>"></label>
+    <label class="field"><span>Pergunta (R$)</span><input class="input" name="price_question" value="<%= centsToInput(r.price_question_cents) %>"></label>
+  </div>
+  <div class="check-grid">
+    <label class="check"><input type="checkbox" name="chat_enabled" value="1" <%= r.chat_enabled ? 'checked' : '' %>> Chat</label>
+    <label class="check"><input type="checkbox" name="video_enabled" value="1" <%= r.video_enabled ? 'checked' : '' %>> Vídeo</label>
+    <label class="check"><input type="checkbox" name="questions_enabled" value="1" <%= r.questions_enabled ? 'checked' : '' %>> Perguntas pagas</label>
+  </div>
+  <div class="row-3">
+    <label class="field"><span>Repasse ao tarólogo (%)</span><input class="input" type="number" min="0" max="100" name="commission_percent" value="<%= r.commission_percent %>"></label>
+    <label class="field"><span>WhatsApp (alertas)</span><input class="input" name="whatsapp" value="<%= r.whatsapp || '' %>"></label>
+    <label class="field"><span>Chave Pix</span><input class="input" name="pix_key" value="<%= r.pix_key || '' %>"></label>
+  </div>
+  <div class="row-3">
+    <label class="field"><span>Ordem na lista</span><input class="input" type="number" name="sort_order" value="<%= r.sort_order || 0 %>"></label>
+    <label class="check"><input type="checkbox" name="featured" value="1" <%= r.featured ? 'checked' : '' %>> Destaque (Top 3 da home)</label>
+    <label class="check"><input type="checkbox" name="active" value="1" <%= r.active ? 'checked' : '' %>> Ativo no site</label>
+  </div>
+  <button class="btn btn-gold">Salvar</button>
+</form>
+<% if (!isNew) { %>
+  <div class="grid grid-2">
+    <div class="card card-body">
+      <h3>Financeiro</h3>
+      <p>Saldo: <strong><%= money(earnings.balanceCents) %></strong> · Em saque: <%= money(earnings.heldCents) %> · Disponível: <strong><%= money(earnings.availableCents) %></strong></p>
+      <form method="post" action="/admin/tarologos/<%= r.id %>/ajuste" class="toolbar">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input class="input" name="amount" placeholder="Valor (use - para debitar)" required>
+        <input class="input" name="description" placeholder="Descrição">
+        <button class="btn btn-outline btn-sm">Lançar ajuste</button>
+      </form>
+    </div>
+    <div class="card card-body">
+      <h3>Atalhos</h3>
+      <div class="toolbar"><a class="btn btn-outline btn-sm" href="/tarologo/<%= r.slug %>" target="_blank">Ver perfil</a><a class="btn btn-outline btn-sm" href="/mensagens?para=<%= r.user_id %>">Enviar mensagem</a><a class="btn btn-outline btn-sm" href="/admin/consultas">Consultas</a></div>
+    </div>
+  </div>
+<% } %>
+<%- include('../partials/admin-bottom') %>

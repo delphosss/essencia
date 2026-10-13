@@ -1,0 +1,24 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container narrow center" data-order-status="<%= order.status %>" data-order="<%= order.id %>">
+    <% if (order.status === 'paid') { %>
+      <h1 class="page-title">Pagamento aprovado!</h1>
+      <% if (order.kind === 'credits') { %>
+        <p><%= money(order.credit_cents) %> em créditos foram adicionados à sua conta.</p>
+        <a href="/tarologos" class="btn btn-gold">Escolher tarólogo</a>
+      <% } else { %>
+        <p>Recebemos seu pedido #<%= order.id %>. Você pode acompanhar em Minha conta → Pedidos da loja.</p>
+        <a href="/minha-conta/pedidos-loja" class="btn btn-gold">Ver pedido</a>
+      <% } %>
+    <% } else if (order.status === 'pending') { %>
+      <h1 class="page-title">Aguardando confirmação</h1>
+      <p>Assim que o pagamento for confirmado, os créditos aparecem na sua conta. Esta página atualiza sozinha.</p>
+      <a href="/pagamento/<%= order.id %>" class="btn btn-outline">Voltar ao pagamento</a>
+    <% } else { %>
+      <h1 class="page-title">Pagamento não concluído</h1>
+      <p>O pedido está como "<%= order.status %>". Você pode tentar novamente.</p>
+      <a href="/comprar-creditos" class="btn btn-gold">Comprar créditos</a>
+    <% } %>
+  </div>
+</section>
+<%- include('../partials/footer', { scripts: ['/public/js/checkout.js'] }) %>

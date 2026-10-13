@@ -1,0 +1,135 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container profile" data-reader-id="<%= r.id %>" data-status="<%= r.status %>">
+    <div class="profile-head">
+      <h1 class="page-title left"><%= r.display_name %></h1>
+      <span class="status-badge" data-status-badge></span>
+      <span class="muted small" data-busy-time></span>
+    </div>
+    <div class="profile-grid">
+      <div class="profile-photo"><%- include('../partials/avatar', { photo: r.photo, name: r.display_name, size: 'avatar-xl' }) %></div>
+      <div>
+        <h2 class="oracles"><%= r.oracles %></h2>
+        <div class="chips"><% categories.forEach((c) => { %><a class="chip chip-sm" href="/categorias/<%= c.slug %>"><%= c.name %></a><% }) %></div>
+        <ul class="price-list">
+          <% if (r.chat_enabled) { %><li>Chat <strong><%= money(r.price_chat_cents) %> / min</strong></li><% } %>
+          <% if (r.video_enabled) { %><li>Vídeo <strong><%= money(r.price_video_cents) %> / min</strong></li><% } %>
+          <% if (r.questions_enabled) { %><li>Pergunta avulsa <strong><%= money(r.price_question_cents) %></strong></li><% } %>
+          <li>Depoimentos recebidos <strong><%= reviewCount %></strong></li>
+        </ul>
+        <div class="profile-actions" data-when="online">
+          <button type="button" class="btn btn-green" data-open-modal="modal-consult">Consultar agora</button>
+        </div>
+        <div class="profile-actions" data-when="busy">
+          <button type="button" class="btn btn-disabled" disabled>Em atendimento</button>
+          <button type="button" class="btn btn-outline" data-alert="<%= r.id %>"><%= alertActive ? 'Aviso ativado ✓' : 'Avise-me quando disponível' %></button>
+        </div>
+        <div class="profile-actions" data-when="offline">
+          <button type="button" class="btn btn-outline" data-alert="<%= r.id %>"><%= alertActive ? 'Aviso ativado ✓' : 'Avise-me quando disponível' %></button>
+        </div>
+        <div class="profile-actions">
+          <% if (slots.length) { %><button type="button" class="btn btn-outline" data-open-modal="modal-schedule">Agendar consulta</button><% } %>
+          <% if (r.questions_enabled) { %><button type="button" class="btn btn-outline" data-open-modal="modal-question" id="perguntar">Enviar pergunta</button><% } %>
+        </div>
+        <div class="prose bio"><%- nl2p(r.bio) %></div>
+      </div>
+    </div>
+
+    <% if (r.chat_enabled) { %>
+    <div class="card simulator">
+      <h3>Quanto custa?</h3>
+      <table class="table compact">
+        <thead><tr><th>Tempo</th><th>Chat</th><% if (r.video_enabled) { %><th>Vídeo</th><% } %></tr></thead>
+        <tbody>
+          <% [10, 15, 20, 30, 60].forEach((m) => { %>
+            <tr><td><%= m %> minutos</td><td><%= money(m * r.price_chat_cents) %></td><% if (r.video_enabled) { %><td><%= money(m * r.price_video_cents) %></td><% } %></tr>
+          <% }) %>
+        </tbody>
+      </table>
+      <% if (user && user.role === 'client') { %><p class="muted small">Com seu saldo atual (<%= money(balance) %>) você tem cerca de <strong><%= Math.floor(balance / r.price_chat_cents) %> min</strong> de chat.</p><% } %>
+    </div>
+    <% } %>
+
+    <h2 class="section-title left">Depoimentos</h2>
+    <% if (!reviews.length) { %><p class="muted">Ainda não há depoimentos publicados.</p><% } %>
+    <div class="review-list">
+      <% reviews.forEach((v) => { %>
+        <div class="review-item">
+          <div><%- include('../partials/stars', { rating: v.rating }) %> <strong><%= ratingLabel(v.rating) %></strong></div>
+          <p><%= v.body %></p>
+          <span class="muted small">Enviado em <%= fmtDate(v.created_at) %></span>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<div class="modal" id="modal-consult" hidden>
+  <div class="modal-box">
+    <h3>Tipo de consulta</h3>
+    <% if (!user) { %>
+      <p>Entre na sua conta para consultar.</p>
+      <div class="modal-actions"><a class="btn btn-gold" href="/entrar?next=/tarologo/<%= r.slug %>">Entrar</a><a class="btn btn-outline" href="/cadastro?next=/tarologo/<%= r.slug %>">Criar conta</a></div>
+    <% } else { %>
+      <form method="post" action="/consultar" data-consult-form>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input type="hidden" name="reader_id" value="<%= r.id %>">
+        <% if (r.chat_enabled) { %><label class="radio-card"><input type="radio" name="type" value="chat" checked> Chat por texto — <%= money(r.price_chat_cents) %>/min</label><% } %>
+        <% if (r.video_enabled) { %><label class="radio-card"><input type="radio" name="type" value="video" <%= r.chat_enabled ? '' : 'checked' %>> Vídeo — <%= money(r.price_video_cents) %>/min</label><% } %>
+        <p class="muted small">Seu saldo: <%= money(balance) %>. A cobrança é por minuto iniciado e só começa quando vocês dois estiverem na sala.</p>
+        <div class="modal-actions"><button class="btn btn-green">Confirmar consulta</button><button type="button" class="btn btn-outline" data-close>Cancelar</button></div>
+      </form>
+    <% } %>
+  </div>
+</div>
+
+<% if (slots.length) { %>
+<div class="modal" id="modal-schedule" hidden>
+  <div class="modal-box">
+    <h3>Agendar consulta</h3>
+    <% if (!user) { %>
+      <p>Entre na sua conta para agendar.</p><a class="btn btn-gold" href="/entrar?next=/tarologo/<%= r.slug %>">Entrar</a>
+    <% } else { %>
+      <form method="post" action="/agendar/<%= r.id %>" class="form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <label class="field"><span>Disponibilidade</span>
+          <select name="slot_id" class="input" required>
+            <% slots.forEach((s) => { %><option value="<%= s.id %>"><%= fmtDateTime(s.starts_at) %> até <%= fmtDateTime(s.ends_at).slice(-5) %></option><% }) %>
+          </select>
+        </label>
+        <label class="field"><span>Horário desejado (opcional)</span><input type="time" name="time" class="input"></label>
+        <label class="field"><span>Observações</span><textarea name="notes" class="input" rows="3" maxlength="500"></textarea></label>
+        <div class="modal-actions"><button class="btn btn-gold">Confirmar agendamento</button><button type="button" class="btn btn-outline" data-close>Cancelar</button></div>
+      </form>
+    <% } %>
+  </div>
+</div>
+<% } %>
+
+<% if (r.questions_enabled) { %>
+<div class="modal" id="modal-question" hidden>
+  <div class="modal-box modal-wide">
+    <h3>Enviar perguntas para <%= r.display_name %></h3>
+    <% if (!user) { %>
+      <p>Entre na sua conta para enviar perguntas.</p><a class="btn btn-gold" href="/entrar?next=/tarologo/<%= r.slug %>">Entrar</a>
+    <% } else { %>
+      <p class="muted small">Cada pergunta custa <strong><%= money(r.price_question_cents) %></strong>. Seu saldo: <strong><%= money(balance) %></strong>. A resposta chega por escrito na sua área.</p>
+      <form method="post" action="/perguntar/<%= r.id %>" class="form" data-question-form data-price="<%= r.price_question_cents %>" data-balance="<%= balance %>" data-max="<%= maxQuestions %>">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <fieldset class="fieldset"><legend>Pessoas envolvidas (opcional)</legend>
+          <div class="row-2"><input class="input" name="person_name" placeholder="Nome"><input class="input" type="date" name="person_birth"></div>
+          <div class="row-2"><input class="input" name="person_name" placeholder="Nome"><input class="input" type="date" name="person_birth"></div>
+        </fieldset>
+        <div data-question-list>
+          <label class="field"><span>Pergunta 1</span><textarea name="questions" class="input" rows="2" required maxlength="1000"></textarea></label>
+        </div>
+        <button type="button" class="btn btn-outline btn-sm" data-question-add>+ Adicionar pergunta</button>
+        <p>Total: <strong data-question-total><%= money(r.price_question_cents) %></strong></p>
+        <p class="alert alert-error" data-question-insufficient hidden>Saldo insuficiente. <a href="/comprar-creditos">Comprar créditos</a></p>
+        <div class="modal-actions"><button class="btn btn-gold" data-question-submit>Comprar e enviar</button><button type="button" class="btn btn-outline" data-close>Cancelar</button></div>
+      </form>
+    <% } %>
+  </div>
+</div>
+<% } %>
+<%- include('../partials/footer') %>

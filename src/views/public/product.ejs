@@ -1,0 +1,23 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container product-page">
+    <div class="product-img product-img-lg" <% if (product.image) { %>style="background-image:url('<%= product.image %>')"<% } %>>
+      <% if (product.compare_at_cents > product.price_cents) { %><span class="package-badge">Oferta</span><% } %>
+    </div>
+    <div>
+      <h1 class="page-title left"><%= product.name %></h1>
+      <% if (product.sku) { %><p class="muted small">Código: <%= product.sku %></p><% } %>
+      <p class="product-price"><% if (product.compare_at_cents > product.price_cents) { %><s class="muted"><%= money(product.compare_at_cents) %></s> <% } %><strong><%= money(product.price_cents) %></strong></p>
+      <p><%= product.summary %></p>
+      <form method="post" action="/carrinho" class="toolbar">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input type="hidden" name="product_id" value="<%= product.id %>">
+        <label class="field inline"><span>Quantidade</span><input class="input input-sm" type="number" name="quantity" value="1" min="1" max="99"></label>
+        <button class="btn btn-gold">Comprar</button>
+      </form>
+      <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://wa.me/?text=<%= encodeURIComponent(`${product.name} ${shareUrl}`) %>">Compartilhar no WhatsApp</a>
+      <div class="prose"><%- product.description %></div>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

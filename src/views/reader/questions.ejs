@@ -1,0 +1,12 @@
+<%- include('../partials/reader-top') %>
+<div class="table-wrap"><table class="table">
+  <thead><tr><th>Data</th><th>Cliente</th><th>Perguntas</th><th>Valor</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+    <% if (!questions.length) { %><tr><td colspan="6" class="muted">Nenhuma pergunta recebida.</td></tr><% } %>
+    <% questions.forEach((x) => { %>
+      <tr class="<%= x.status === 'pending' ? 'unread' : '' %>"><td><%= fmtDateTime(x.created_at) %></td><td><%= x.client_name %></td><td><%= x.quantity %></td><td><%= money(x.total_cents) %></td><td><%- include('../partials/status-label', { s: x.status }) %></td>
+      <td><a class="btn btn-<%= x.status === 'pending' ? 'gold' : 'outline' %> btn-sm" href="/atendente/perguntas/<%= x.id %>"><%= x.status === 'pending' ? 'Responder' : 'Ver' %></a></td></tr>
+    <% }) %>
+  </tbody>
+</table></div>
+<%- include('../partials/reader-bottom') %>

@@ -1,0 +1,29 @@
+<%- include('../partials/header') %>
+<article class="section">
+  <div class="container narrow">
+    <% if (post.category_name) { %><a class="chip chip-sm" href="/blog/categoria/<%= post.category_slug %>"><%= post.category_name %></a><% } %>
+    <h1 class="page-title left"><%= post.title %></h1>
+    <p class="muted small"><%= fmtDate(post.published_at) %></p>
+    <% if (post.cover) { %><img class="post-hero" src="<%= post.cover %>" alt=""><% } %>
+    <div class="prose"><%- post.body %></div>
+    <div class="share">
+      <span class="muted small">Compartilhe:</span>
+      <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://wa.me/?text=<%= encodeURIComponent(`${post.title} ${shareUrl}`) %>">WhatsApp</a>
+      <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent(shareUrl) %>">Facebook</a>
+    </div>
+    <h2 class="section-title left" id="comentarios">Comentários</h2>
+    <% if (!comments.length) { %><p class="muted">Seja o primeiro a comentar.</p><% } %>
+    <% comments.forEach((c) => { %><div class="review-item"><strong><%= c.name %></strong> <span class="muted small"><%= fmtDate(c.created_at) %></span><p><%= c.body %></p></div><% }) %>
+    <form method="post" action="/blog/<%= post.slug %>/comentar" class="form card card-body">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div class="row-2">
+        <label class="field"><span>Nome</span><input class="input" name="name" required value="<%= user ? user.name : '' %>"></label>
+        <label class="field"><span>E-mail (não é publicado)</span><input class="input" type="email" name="email" value="<%= user ? user.email : '' %>"></label>
+      </div>
+      <label class="field"><span>Comentário</span><textarea class="input" name="body" rows="4" required></textarea></label>
+      <button class="btn btn-gold">Comentar</button>
+    </form>
+  </div>
+</article>
+<%- include('../partials/footer') %>

@@ -1,0 +1,28 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container">
+    <h1 class="page-title"><%= category ? category.name : 'Loja' %></h1>
+    <form class="toolbar" method="get" action="/loja">
+      <input class="input" name="busca" value="<%= search %>" placeholder="Buscar na loja">
+      <button class="btn btn-outline btn-sm">Buscar</button>
+      <a class="chip <%= query.ofertas ? 'active' : '' %>" href="/loja?ofertas=1">Ofertas</a>
+      <% cats.forEach((c) => { %><a class="chip <%= category && category.id === c.id ? 'active' : '' %>" href="/loja/categoria/<%= c.slug %>"><%= c.name %></a><% }) %>
+    </form>
+    <% if (!products.length) { %><p class="muted center">Nenhum produto encontrado.</p><% } %>
+    <div class="grid grid-3">
+      <% products.forEach((p) => { %>
+        <article class="card product-card">
+          <a href="/loja/produto/<%= p.slug %>" class="product-img" <% if (p.image) { %>style="background-image:url('<%= p.image %>')"<% } %>>
+            <% if (p.compare_at_cents > p.price_cents) { %><span class="package-badge">Oferta</span><% } %>
+          </a>
+          <div class="card-body">
+            <h3><a href="/loja/produto/<%= p.slug %>"><%= p.name %></a></h3>
+            <p class="muted"><%= truncate(p.summary, 100) %></p>
+            <p><% if (p.compare_at_cents > p.price_cents) { %><s class="muted"><%= money(p.compare_at_cents) %></s> <% } %><strong class="price"><%= money(p.price_cents) %></strong></p>
+          </div>
+        </article>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>
