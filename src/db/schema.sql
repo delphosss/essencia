@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS readers (
   chat_enabled         INTEGER NOT NULL DEFAULT 1,
   video_enabled        INTEGER NOT NULL DEFAULT 0,
   questions_enabled    INTEGER NOT NULL DEFAULT 1,
-  commission_percent   INTEGER NOT NULL DEFAULT 50, -- % do valor bruto que fica com o tarólogo
+  commission_percent   INTEGER NOT NULL DEFAULT 30, -- % do valor bruto que fica com o tarólogo (o resto é do site)
   whatsapp             TEXT,
   pix_key              TEXT,
   status               TEXT NOT NULL DEFAULT 'offline' CHECK (status IN ('online','busy','offline')),
@@ -417,4 +417,12 @@ CREATE TABLE IF NOT EXISTS error_logs (
   message    TEXT,
   data       TEXT,
   created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+);
+
+-- Redirecionamentos 301 personalizados (migração de URLs antigas).
+CREATE TABLE IF NOT EXISTS redirects (
+  id        INTEGER PRIMARY KEY,
+  from_path TEXT NOT NULL UNIQUE,
+  to_path   TEXT NOT NULL,
+  hits      INTEGER NOT NULL DEFAULT 0
 );

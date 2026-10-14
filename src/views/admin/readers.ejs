@@ -1,7 +1,7 @@
 <%- include('../partials/admin-top') %>
 <div class="toolbar between"><p class="muted">Tarólogos cadastrados. Candidatos chegam por <a href="/admin/candidaturas">Candidaturas</a>.</p><a href="/admin/tarologos/novo" class="btn btn-gold btn-sm">Novo tarólogo</a></div>
 <div class="table-wrap"><table class="table">
-  <thead><tr><th></th><th>Nome</th><th>E-mail</th><th>Status</th><th>Chat</th><th>Vídeo</th><th>Pergunta</th><th>Repasse</th><th>Saldo a pagar</th><th>Depoim.</th><th>Destaque</th><th>Ativo</th><th></th></tr></thead>
+  <thead><tr><th></th><th>Nome</th><th>E-mail</th><th>Status</th><th>Chat</th><th>Vídeo</th><th>Pergunta</th><th>Tarólogo / site</th><th>Saldo a pagar</th><th>Depoim.</th><th>Destaque</th><th>Ativo</th><th></th></tr></thead>
   <tbody>
     <% readers.forEach((r) => { %>
       <tr>
@@ -9,7 +9,7 @@
         <td><a href="/admin/tarologos/<%= r.id %>"><%= r.display_name %></a></td><td class="small"><%= r.email %></td>
         <td><%- include('../partials/status-label', { s: r.status }) %></td>
         <td><%= r.chat_enabled ? money(r.price_chat_cents) : '—' %></td><td><%= r.video_enabled ? money(r.price_video_cents) : '—' %></td><td><%= r.questions_enabled ? money(r.price_question_cents) : '—' %></td>
-        <td><%= r.commission_percent %>%</td><td><%= money(r.earnings.availableCents) %></td><td><%= r.review_count %></td>
+        <td><%= r.is_owner ? 'Casa (100%)' : `${r.commission_percent}% / ${100 - r.commission_percent}%` %></td><td><%= r.is_owner ? '—' : money(r.earnings.availableCents) %></td><td><%= r.review_count %></td>
         <td><%= r.featured ? '★' : '' %></td><td><%= r.active ? 'Sim' : 'Não' %></td>
         <td class="nowrap">
           <form method="post" action="/admin/tarologos/<%= r.id %>/status" class="inline-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>">

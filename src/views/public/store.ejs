@@ -1,7 +1,8 @@
 <%- include('../partials/header') %>
 <section class="section">
   <div class="container">
-    <h1 class="page-title"><%= category ? category.name : 'Loja' %></h1>
+    <h1 class="page-title"><%= category ? category.name : 'Loja espiritual' %></h1>
+    <% if (category && category.description) { %><div class="intro prose center"><%- nl2p(category.description) %></div><% } %>
     <form class="toolbar" method="get" action="/loja">
       <input class="input" name="busca" value="<%= search %>" placeholder="Buscar na loja">
       <button class="btn btn-outline btn-sm">Buscar</button>
@@ -12,12 +13,14 @@
     <div class="grid grid-3">
       <% products.forEach((p) => { %>
         <article class="card product-card">
-          <a href="/loja/produto/<%= p.slug %>" class="product-img" <% if (p.image) { %>style="background-image:url('<%= p.image %>')"<% } %>>
+          <a href="/loja/produto/<%= p.slug %>" class="product-img" aria-label="<%= p.name %>">
+            <% if (p.image) { %><img src="<%= p.image %>" srcset="<%= srcset(p.image, 1200) %>" sizes="(max-width: 640px) 100vw, 380px" alt="<%= p.name %>" loading="lazy" decoding="async"><% } %>
             <% if (p.compare_at_cents > p.price_cents) { %><span class="package-badge">Oferta</span><% } %>
           </a>
           <div class="card-body">
             <h3><a href="/loja/produto/<%= p.slug %>"><%= p.name %></a></h3>
             <p class="muted"><%= truncate(p.summary, 100) %></p>
+            <% if (p.delivery_days) { %><p class="muted small">Realizado em até <%= p.delivery_days %> dia(s)</p><% } %>
             <p><% if (p.compare_at_cents > p.price_cents) { %><s class="muted"><%= money(p.compare_at_cents) %></s> <% } %><strong class="price"><%= money(p.price_cents) %></strong></p>
           </div>
         </article>

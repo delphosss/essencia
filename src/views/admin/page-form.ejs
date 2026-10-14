@@ -3,7 +3,10 @@
 <form method="post" action="/admin/paginas/<%= page.slug %>" class="form card card-body">
   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
   <label class="field"><span>Título</span><input class="input" name="title" value="<%= page.title %>" required></label>
-  <label class="field"><span>Conteúdo (HTML)</span><textarea class="input mono" name="body" rows="22"><%= page.body %></textarea></label>
+  <label class="field"><span>Conteúdo (HTML)</span><textarea class="input mono" name="body" rows="22" data-rich><%= page.body %></textarea></label>
   <button class="btn btn-gold">Salvar</button>
 </form>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css">
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js" defer></script>
+<script src="<%= asset('/public/js/editor.js') %>" defer></script>
 <%- include('../partials/admin-bottom') %>

@@ -14,6 +14,9 @@
       <dt>Ref. gateway</dt><dd class="mono small"><%= order.gateway_ref || '—' %></dd>
     </dl>
     <% if (items.length) { %><h4>Itens</h4><ul><% items.forEach((i) => { %><li><%= i.quantity %>× <%= i.name %> — <%= money(i.price_cents * i.quantity) %></li><% }) %></ul><% } %>
+    <% JSON.parse(order.details_json || '[]').forEach((d) => { %>
+      <div class="card card-body"><strong><%= d.product %></strong><br>Pessoas: <%= d.people %><br>Nascimento: <%= d.birthdates || '—' %><br>Intenção: <%= d.intention %></div>
+    <% }) %>
     <% if (order.shipping_json) { %><p class="muted">Observações do cliente: <%= JSON.parse(order.shipping_json).notes %></p><% } %>
   </div>
   <div class="card card-body">
@@ -29,6 +32,17 @@
     <% if (order.status === 'paid') { %>
       <form method="post" action="/admin/pedidos/<%= order.id %>/estornar" class="inline-form" data-confirm="Estornar? Os créditos serão retirados da carteira do cliente. A devolução do dinheiro deve ser feita no painel do gateway.">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-danger btn-sm">Estornar</button>
+      </form>
+    <% } %>
+    <% if (order.kind === 'store' && order.status === 'paid') { %>
+      <form method="post" action="/admin/pedidos/<%= order.id %>/andamento" class="form">
+        <h4>Andamento do trabalho</h4>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <select class="input" name="fulfillment_status">
+          <% [['received', 'Recebido'], ['in_progress', 'Em andamento'], ['done', 'Concluído']].forEach(([k, l]) => { %><option value="<%= k %>" <%= order.fulfillment_status === k ? 'selected' : '' %>><%= l %></option><% }) %>
+        </select>
+        <label class="field"><span>Mensagem para o cliente (notificação + e-mail)</span><textarea class="input" name="fulfillment_note" rows="3"><%= order.fulfillment_note || '' %></textarea></label>
+        <button class="btn btn-gold btn-sm">Atualizar e avisar o cliente</button>
       </form>
     <% } %>
     <form method="post" action="/admin/pedidos/<%= order.id %>/nota" class="form">

@@ -2,6 +2,7 @@
 <section class="section">
   <div class="container">
     <h1 class="page-title"><%= category ? category.name : 'Blog' %></h1>
+    <% if (category && category.description) { %><div class="intro prose center"><%- nl2p(category.description) %></div><% } %>
     <div class="chips center">
       <a class="chip <%= !category ? 'active' : '' %>" href="/blog">Todos</a>
       <% cats.forEach((c) => { %><a class="chip <%= category && category.id === c.id ? 'active' : '' %>" href="/blog/categoria/<%= c.slug %>"><%= c.name %></a><% }) %>
@@ -10,9 +11,10 @@
     <div class="grid grid-3"><% posts.forEach((p) => { %><%- include('../partials/post-card', { p }) %><% }) %></div>
     <% if (pages > 1) { %>
       <nav class="pagination">
-        <% for (let i = 1; i <= pages; i++) { %><a class="<%= i === page ? 'active' : '' %>" href="?pagina=<%= i %>"><%= i %></a><% } %>
+        <% for (let i = 1; i <= pages; i++) { %><a class="<%= i === page ? 'active' : '' %>" href="<%= basePath %><%= i > 1 ? `?pagina=${i}` : '' %>" <%- i === page ? 'aria-current="page"' : '' %>><%= i %></a><% } %>
       </nav>
     <% } %>
   </div>
 </section>
+<p class="center small"><a href="/blog/feed.xml">Assinar o feed RSS</a></p>
 <%- include('../partials/footer') %>

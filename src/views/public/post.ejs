@@ -3,14 +3,28 @@
   <div class="container narrow">
     <% if (post.category_name) { %><a class="chip chip-sm" href="/blog/categoria/<%= post.category_slug %>"><%= post.category_name %></a><% } %>
     <h1 class="page-title left"><%= post.title %></h1>
-    <p class="muted small"><%= fmtDate(post.published_at) %></p>
-    <% if (post.cover) { %><img class="post-hero" src="<%= post.cover %>" alt=""><% } %>
+    <p class="muted small">
+      <% if (post.author) { %>Por <strong><%= post.author %></strong> · <% } %>
+      <time datetime="<%= post.published_at %>"><%= fmtDate(post.published_at) %></time>
+      <% if (post.updated_at && post.updated_at.slice(0, 10) !== post.published_at.slice(0, 10)) { %> · atualizado em <%= fmtDate(post.updated_at) %><% } %>
+      · <%= readingMinutes %> min de leitura
+    </p>
+    <% if (post.cover) { %><img class="post-hero" src="<%= post.cover %>" srcset="<%= srcset(post.cover, 1400) %>" sizes="(max-width: 900px) 100vw, 860px" alt="<%= post.title %>" fetchpriority="high"><% } %>
     <div class="prose"><%- post.body %></div>
     <div class="share">
       <span class="muted small">Compartilhe:</span>
       <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://wa.me/?text=<%= encodeURIComponent(`${post.title} ${shareUrl}`) %>">WhatsApp</a>
       <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent(shareUrl) %>">Facebook</a>
     </div>
+    <aside class="card card-body cta-box">
+      <h3>Quer uma leitura só para você?</h3>
+      <p>Converse agora com um dos nossos tarólogos online e tire suas dúvidas por chat.</p>
+      <a href="/tarologos" class="btn btn-gold">Ver tarólogos online</a>
+    </aside>
+    <% if (related.length) { %>
+      <h2 class="section-title left">Leia também</h2>
+      <div class="grid grid-3"><% related.forEach((p) => { %><%- include('../partials/post-card', { p }) %><% }) %></div>
+    <% } %>
     <h2 class="section-title left" id="comentarios">Comentários</h2>
     <% if (!comments.length) { %><p class="muted">Seja o primeiro a comentar.</p><% } %>
     <% comments.forEach((c) => { %><div class="review-item"><strong><%= c.name %></strong> <span class="muted small"><%= fmtDate(c.created_at) %></span><p><%= c.body %></p></div><% }) %>

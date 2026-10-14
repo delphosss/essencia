@@ -1,7 +1,9 @@
 // Configurações editáveis pelo admin (tabela settings). Os segredos ficam no .env.
 const DEFAULTS = {
-  site_name: 'Arcano',
-  site_tagline: 'Consultas de tarot online, ao vivo',
+  site_name: 'Essência do Tarot',
+  site_tagline: 'Consulta de tarot online por chat, ao vivo',
+  site_logo: '/public/img/logo-essencia.webp',
+  site_favicon: '/public/img/icon-essencia.png',
   support_email: 'contato@exemplo.com',
   support_phone: '',
   support_whatsapp: '',
@@ -16,7 +18,7 @@ const DEFAULTS = {
   default_price_chat_cents: '199',
   default_price_video_cents: '590',
   default_price_question_cents: '500',
-  default_commission_percent: '50',
+  default_commission_percent: '30',
   min_balance_minutes: '1',
   call_timeout_seconds: '240',
   ring_seconds: '60',

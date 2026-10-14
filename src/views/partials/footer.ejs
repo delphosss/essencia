@@ -2,12 +2,12 @@
 <footer class="footer">
   <div class="container footer-grid">
     <div>
-      <a href="/" class="logo logo-sm"><img src="/public/img/icon.svg" alt="" width="32" height="32"><span><%= site.site_name %></span></a>
+      <%- include('logo', { cls: 'logo-sm', lazy: true }) %>
       <p class="muted"><%= site.site_tagline %></p>
       <p class="muted small">Atendimento exclusivo para maiores de 18 anos. As consultas são orientações e não substituem acompanhamento profissional de saúde, jurídico ou financeiro.</p>
     </div>
     <div>
-      <h4>Institucional</h4>
+      <h2 class="footer-title">Institucional</h2>
       <ul>
         <li><a href="/quem-somos">Quem somos</a></li>
         <li><a href="/perguntas-frequentes">Como consultar</a></li>
@@ -17,7 +17,7 @@
       </ul>
     </div>
     <div>
-      <h4>Atendimento</h4>
+      <h2 class="footer-title">Atendimento</h2>
       <ul>
         <li><a href="/contato">Fale conosco</a></li>
         <% if (site.support_email) { %><li><a href="mailto:<%= site.support_email %>"><%= site.support_email %></a></li><% } %>
@@ -27,7 +27,7 @@
       </ul>
     </div>
     <div>
-      <h4>Pagamento seguro</h4>
+      <h2 class="footer-title">Pagamento seguro</h2>
       <div class="pay-badges"><span>Pix</span><span>Cartão</span><span>PayPal</span></div>
       <p class="muted small">Pagamentos processados por Mercado Pago e PayPal. Não armazenamos dados de cartão.</p>
     </div>
@@ -83,8 +83,8 @@
 <% } %>
 
 <div class="toasts" data-toasts aria-live="polite"></div>
-<script src="/socket.io/socket.io.js"></script>
-<script src="/public/js/app.js"></script>
-<% if (locals.scripts) { scripts.forEach((s) => { %><script src="<%= s %>"></script><% }) } %>
+<script src="/socket.io/socket.io.js" defer></script>
+<script src="<%= asset('/public/js/app.js') %>" defer></script>
+<% if (locals.scripts) { scripts.forEach((s) => { %><script src="<%= asset(s) %>" defer></script><% }) } %>
 </body>
 </html>

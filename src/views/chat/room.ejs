@@ -2,7 +2,7 @@
 <body class="room-page">
 <div class="room" data-room="<%= c.code %>" data-role="<%= role %>" data-status="<%= c.status %>" data-type="<%= c.type %>" data-price="<%= c.price_per_min_cents %>">
   <header class="room-head">
-    <a href="<%= role === 'reader' ? '/atendente' : role === 'admin' ? '/admin/consultas' : '/minha-conta' %>" class="logo logo-sm"><img src="/public/img/icon.svg" alt="" width="28" height="28"></a>
+    <a href="<%= role === 'reader' ? '/atendente' : role === 'admin' ? '/admin/consultas' : '/minha-conta' %>" class="logo logo-sm"><img src="<%= site.site_favicon || '/public/img/icon.svg' %>" alt="<%= site.site_name %>" width="36" height="36"></a>
     <div class="room-who">
       <% if (role === 'reader') { %>
         <strong><%= client.name %></strong>
@@ -65,9 +65,9 @@
   </div>
 </div>
 <div class="toasts" data-toasts aria-live="polite"></div>
-<script src="/socket.io/socket.io.js"></script>
-<script src="/public/js/app.js"></script>
-<% if (c.type === 'video') { %><script src="https://<%= jitsiDomain %>/external_api.js"></script><% } %>
-<script src="/public/js/room.js"></script>
+<script src="/socket.io/socket.io.js" defer></script>
+<script src="<%= asset('/public/js/app.js') %>" defer></script>
+<% if (c.type === 'video') { %><script src="https://<%= jitsiDomain %>/external_api.js" defer></script><% } %>
+<script src="<%= asset('/public/js/room.js') %>" defer></script>
 </body>
 </html>

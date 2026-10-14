@@ -9,7 +9,12 @@
     <% } else { %>
       <label class="field"><span><%= f.label %><%= f.required ? ' *' : '' %></span>
         <% if (f.type === 'textarea') { %><textarea class="input" name="<%= f.name %>" rows="4"><%= v || '' %></textarea>
-        <% } else if (f.type === 'html') { %><textarea class="input mono" name="<%= f.name %>" rows="14"><%= v || '' %></textarea>
+        <% } else if (f.type === 'html') { %><textarea class="input mono" name="<%= f.name %>" rows="14" data-rich><%= v || '' %></textarea>
+        <% } else if (f.type === 'gallery') { %>
+          <div class="gallery-edit">
+            <% JSON.parse(v || '[]').forEach((src) => { %><label class="gallery-thumb"><img src="<%= src %>" alt=""><span><input type="checkbox" name="<%= f.name %>_keep" value="<%= src %>" checked> manter</span></label><% }) %>
+          </div>
+          <input class="input" type="file" name="<%= f.name %>" accept="image/*" multiple>
         <% } else if (f.type === 'money') { %><input class="input" name="<%= f.name %>" inputmode="decimal" value="<%= v === null || v === '' ? '' : centsToInput(v) %>">
         <% } else if (f.type === 'number') { %><input class="input" type="number" name="<%= f.name %>" value="<%= v ?? '' %>">
         <% } else if (f.type === 'datetime') { %><input class="input" type="datetime-local" name="<%= f.name %>" value="<%= toLocal(v) %>">
@@ -28,4 +33,9 @@
   <% if (r.slugFrom && !isNew) { %><label class="field"><span>Slug (endereço)</span><input class="input" name="slug" value="<%= row.slug %>"></label><% } %>
   <button class="btn btn-gold">Salvar</button>
 </form>
+<% if (r.fields.some((f) => f.type === 'html')) { %>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css">
+  <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js" defer></script>
+  <script src="<%= asset('/public/js/editor.js') %>" defer></script>
+<% } %>
 <%- include('../partials/admin-bottom') %>

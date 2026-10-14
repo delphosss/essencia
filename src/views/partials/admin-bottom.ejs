@@ -2,8 +2,8 @@
   </div>
 </div>
 <div class="toasts" data-toasts aria-live="polite"></div>
-<script src="/socket.io/socket.io.js"></script>
-<script src="/public/js/app.js"></script>
-<script src="/public/js/admin.js"></script>
+<script src="/socket.io/socket.io.js" defer></script>
+<script src="<%= asset('/public/js/app.js') %>" defer></script>
+<script src="<%= asset('/public/js/admin.js') %>" defer></script>
 </body>
 </html>

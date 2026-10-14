@@ -26,7 +26,16 @@
       </table>
       <form method="post" action="/carrinho/finalizar" class="form">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        <label class="field"><span>Observações para o pedido (nomes, datas de nascimento, detalhes)</span><textarea class="input" name="notes" rows="3"></textarea></label>
+        <% items.filter((i) => i.product.requires_details).forEach((i) => { %>
+          <fieldset class="fieldset">
+            <legend>Dados para: <%= i.product.name %></legend>
+            <label class="field"><span>Nome completo da(s) pessoa(s) envolvida(s) *</span><input class="input" name="people_<%= i.productId %>" required maxlength="500"></label>
+            <label class="field"><span>Data(s) de nascimento</span><input class="input" name="birthdates_<%= i.productId %>" maxlength="200" placeholder="Ex.: 10/05/1990 e 22/11/1988"></label>
+            <label class="field"><span>Seu pedido / intenção *</span><textarea class="input" name="intention_<%= i.productId %>" rows="3" required maxlength="1000"></textarea></label>
+          </fieldset>
+        <% }) %>
+        <label class="field"><span>Observações gerais (opcional)</span><textarea class="input" name="notes" rows="2"></textarea></label>
+        <p class="muted small">Seus dados são confidenciais e usados apenas para a realização do trabalho.</p>
         <button class="btn btn-gold btn-block"><%= user ? 'Finalizar compra' : 'Entrar para finalizar' %></button>
       </form>
       <p class="muted small">Para remover um item, altere a quantidade para 0.</p>

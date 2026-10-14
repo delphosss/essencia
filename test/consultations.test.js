@@ -48,8 +48,8 @@ test('cobra por minuto iniciado enquanto os dois estão na sala', () => {
   assert.equal(c.charged_cents, 398);
   assert.equal(c.balance_end_cents, 602);
   assert.equal(ctx.db.prepare('SELECT status FROM readers WHERE id = ?').get(reader.id).status, 'online');
-  // Repasse de 50% para o tarólogo.
-  assert.equal(ctx.earnings.summary(reader.id).balanceCents, 199);
+  // Repasse de 30% para o tarólogo (R$ 3,98 × 30% = R$ 1,19); 70% fica com o site.
+  assert.equal(ctx.earnings.summary(reader.id).balanceCents, 119);
 });
 
 test('encerra sozinha quando o saldo não cobre o próximo minuto', () => {
@@ -167,4 +167,21 @@ test('reinício do servidor encerra sessões abertas sem perder o que foi cobrad
   assert.equal(c.status, 'ended');
   assert.equal(c.end_reason, 'server_restart');
   assert.equal(c.charged_cents, 199);
+});
+
+test('perfil da dona (Dama da Noite) fica com 100%, sem repasse', () => {
+  const ctx = createTestCtx();
+  const client = makeClient(ctx, { balance: 1000 });
+  const owner = ctx.db.prepare("SELECT * FROM readers WHERE slug = 'dama-da-noite'").get();
+  assert.equal(owner.is_owner, 1);
+  assert.equal(owner.commission_percent, 100);
+  assert.equal(ctx.db.prepare('SELECT commission_percent FROM readers WHERE is_owner = 0 LIMIT 1').get().commission_percent, 30);
+  ctx.consultations.setReaderStatus(owner.id, 'online');
+  const { code } = ctx.consultations.startCall(client, owner.id, 'chat');
+  ctx.consultations.acceptCall(owner.user_id, code);
+  ctx.consultations.join(code, 'client');
+  ctx.consultations.join(code, 'reader');
+  ctx.consultations.tick(ctx.advance(1000));
+  ctx.consultations.endByUser(code, client.id);
+  assert.equal(ctx.earnings.summary(owner.id).balanceCents, 199);
 });

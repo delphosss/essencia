@@ -13,6 +13,19 @@ function seed(ctx, { demo = true } = {}) {
         .run(config.admin.email, bcrypt.hashSync(config.admin.password, 10));
     }
 
+    // Perfil da dona do site: atende como taróloga, mas 100% do valor é da casa.
+    if (!db.prepare("SELECT 1 FROM readers WHERE slug = 'dama-da-noite'").get()) {
+      let owner = db.prepare('SELECT id FROM users WHERE email = ?').get(config.owner.email);
+      if (!owner) {
+        owner = { id: db.prepare("INSERT INTO users (role, name, email, password_hash) VALUES ('reader', 'Dama da Noite', ?, ?)")
+          .run(config.owner.email, bcrypt.hashSync(config.owner.password, 10)).lastInsertRowid };
+      }
+      db.prepare(`INSERT INTO readers (user_id, slug, display_name, oracles, bio, price_chat_cents, price_question_cents,
+        commission_percent, is_owner, featured, sort_order) VALUES (?, 'dama-da-noite', 'Dama da Noite', ?, ?, 199, 500, 100, 1, 1, -1)`)
+        .run(owner.id, 'Tarot Rider-Waite, Baralho Cigano, Lenormand, Tarô dos Guardiões',
+          'Edite esta apresentação em Admin → Tarólogos ou no painel da taróloga.');
+    }
+
     if (!count('categories')) {
       const cats = ['Amor e relacionamentos', 'Carreira e trabalho', 'Finanças', 'Espiritualidade', 'Família',
         'Saúde emocional', 'Autoconhecimento', 'Decisões e caminhos', 'Energias e proteção', 'Sonhos e sinais'];
@@ -75,11 +88,11 @@ function seed(ctx, { demo = true } = {}) {
 
     if (!demo) return;
 
-    if (!db.prepare("SELECT 1 FROM users WHERE role = 'reader'").get()) {
+    if (!db.prepare("SELECT 1 FROM readers WHERE is_owner = 0").get()) {
       const hash = bcrypt.hashSync('tarot123', 10);
       const insUser = db.prepare("INSERT INTO users (role, name, email, password_hash, phone) VALUES ('reader', ?, ?, ?, ?)");
       const insReader = db.prepare(`INSERT INTO readers (user_id, slug, display_name, oracles, bio, price_chat_cents, price_video_cents,
-        price_question_cents, video_enabled, commission_percent, featured, sort_order, whatsapp) VALUES (?, ?, ?, ?, ?, 199, 590, 500, ?, 50, ?, ?, ?)`);
+        price_question_cents, video_enabled, commission_percent, featured, sort_order, whatsapp) VALUES (?, ?, ?, ?, ?, 199, 590, 500, ?, 30, ?, ?, ?)`);
       const insCat = db.prepare('INSERT INTO reader_categories (reader_id, category_id) VALUES (?, ?)');
       const catIds = db.prepare('SELECT id FROM categories ORDER BY sort_order').all().map((c) => c.id);
       const readers = [

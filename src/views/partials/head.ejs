@@ -3,16 +3,36 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><%= title ? `${title} | ${site.site_name}` : site.site_name %></title>
-  <meta name="description" content="<%= description || site.site_tagline %>">
+  <% const _title = title ? `${title} | ${site.site_name}` : site.site_name;
+     const _desc = description || site.site_tagline;
+     const _canonical = canonical || `${baseUrl}${originalPath === '/' ? '/' : originalPath}`;
+     const _image = seo.abs(ogImage || site.site_logo); %>
+  <title><%= _title %></title>
+  <meta name="description" content="<%= _desc %>">
+  <link rel="canonical" href="<%= _canonical %>">
+  <% if (noindex) { %><meta name="robots" content="noindex, nofollow"><% } else { %><meta name="robots" content="index, follow, max-image-preview:large"><% } %>
+  <meta property="og:site_name" content="<%= site.site_name %>">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:type" content="<%= ogType %>">
+  <meta property="og:title" content="<%= title || site.site_name %>">
+  <meta property="og:description" content="<%= _desc %>">
+  <meta property="og:url" content="<%= _canonical %>">
+  <% if (_image) { %><meta property="og:image" content="<%= _image %>"><% } %>
+  <meta name="twitter:card" content="summary_large_image">
+  <% jsonld.filter(Boolean).forEach((j) => { %><script type="application/ld+json"><%- JSON.stringify(j).replace(/</g, '\\u003c') %></script>
+  <% }) %>
   <meta name="csrf-token" content="<%= csrfToken %>">
   <meta name="theme-color" content="#2a1245">
   <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="icon" href="/public/img/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="<%= site.site_favicon || '/public/img/icon.svg' %>">
+  <link rel="apple-touch-icon" href="/public/img/icon-essencia-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/public/css/style.css">
+  <% const _fonts = 'https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap'; %>
+  <link rel="preload" as="style" href="<%= _fonts %>" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="<%= _fonts %>"></noscript>
+  <% if (site.site_logo) { %><link rel="preload" as="image" href="<%= site.site_logo %>" fetchpriority="high"><% } %>
+  <link rel="stylesheet" href="<%= asset('/public/css/style.css') %>">
   <script>
     window.SITE = <%- JSON.stringify({
       user: user ? { id: user.id, role: user.role, name: user.name } : null,

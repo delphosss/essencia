@@ -2,10 +2,7 @@
 <body class="<%= locals.bodyClass || '' %>">
 <header class="topbar">
   <div class="container topbar-inner">
-    <a href="/" class="logo" aria-label="<%= site.site_name %>">
-      <img src="/public/img/icon.svg" alt="" width="40" height="40">
-      <span><%= site.site_name %></span>
-    </a>
+    <%- include('logo') %>
     <div class="topbar-actions">
       <% if (user) { %>
         <% if (user.role === 'client') { %>
@@ -28,7 +25,7 @@
         <a href="/entrar" class="top-link">Entrar</a>
         <a href="/cadastro" class="btn btn-gold btn-sm">Criar conta</a>
       <% } %>
-      <a href="/carrinho" class="cart-link" aria-label="Carrinho">
+      <a href="/carrinho" class="cart-link" aria-label="Carrinho: <%= cartCount %> itens">
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM5.2 4l.6 3H21l-2 8H7.2L4.4 2H1v2Z"/></svg>
         <span class="cart-count"><%= cartCount %></span>
       </a>
@@ -48,3 +45,4 @@
 </header>
 <%- include('flash') %>
 <main>
+<%- include('breadcrumbs') %>

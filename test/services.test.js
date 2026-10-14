@@ -14,7 +14,7 @@ test('pergunta paga: debita, responde, gera ganho; reembolso devolve', () => {
   assert.equal(ctx.db.prepare('SELECT COUNT(*) n FROM questions').get().n, 1, 'pergunta sem saldo não fica gravada');
   ctx.questions.answer(reader.user_id, id, 'As cartas mostram um bom momento para mudanças.');
   assert.equal(ctx.questions.get(id).status, 'answered');
-  assert.equal(ctx.earnings.summary(reader.id).balanceCents, 500);
+  assert.equal(ctx.earnings.summary(reader.id).balanceCents, 300); // 30% de R$ 10,00
   const other = makeClient(ctx, { balance: 500 });
   const id2 = ctx.questions.ask(other, reader.id, { questions: ['Teste'] });
   ctx.questions.refund(id2);

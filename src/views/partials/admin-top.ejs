@@ -2,14 +2,14 @@
 <body class="admin">
 <div class="admin-shell">
   <aside class="admin-side" data-admin-side>
-    <a href="/admin" class="logo logo-sm"><img src="/public/img/icon.svg" alt="" width="28" height="28"><span><%= site.site_name %></span></a>
+    <%- include('logo', { cls: 'logo-sm', href: '/admin' }) %>
     <% const pc = locals.pendingCounts || {}; const groups = [
       ['Visão geral', [['/admin', 'Dashboard'], ['/admin/consultas', 'Consultas'], ['/admin/logs', 'Logs']]],
       ['Pessoas', [['/admin/tarologos', 'Tarólogos'], ['/admin/clientes', 'Clientes'], ['/admin/candidaturas', 'Candidaturas', pc.applications], ['/mensagens', 'Mensagens', pc.messages], ['/admin/contatos', 'Fale conosco', pc.contacts]]],
       ['Financeiro', [['/admin/pedidos', 'Pedidos'], ['/admin/saques', 'Saques', pc.withdrawals], ['/admin/pacotes', 'Pacotes'], ['/admin/cupons', 'Cupons']]],
       ['Atendimento', [['/admin/perguntas', 'Perguntas pagas'], ['/admin/agendamentos', 'Agendamentos'], ['/admin/depoimentos', 'Depoimentos', pc.reviews], ['/admin/categorias', 'Categorias']]],
       ['Conteúdo', [['/admin/banners', 'Banners'], ['/admin/paginas', 'Páginas'], ['/admin/faq', 'FAQ'], ['/admin/posts', 'Blog'], ['/admin/blog-categorias', 'Categorias do blog'], ['/admin/comentarios', 'Comentários', pc.comments], ['/admin/produtos', 'Produtos'], ['/admin/loja-categorias', 'Categorias da loja']]],
-      ['Sistema', [['/admin/notificacoes', 'Notificações'], ['/admin/configuracoes', 'Configurações']]],
+      ['Sistema', [['/admin/notificacoes', 'Notificações'], ['/admin/redirecionamentos', 'Redirecionamentos (SEO)'], ['/admin/configuracoes', 'Configurações']]],
     ]; %>
     <% groups.forEach(([g, links]) => { %>
       <div class="side-group"><span><%= g %></span>

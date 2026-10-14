@@ -160,6 +160,19 @@
     }
   }
 
+  // Galeria do produto
+  const gallery = $('[data-gallery]');
+  if (gallery) {
+    gallery.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-gallery-src]');
+      if (!btn) return;
+      const main = $('[data-gallery-main]', gallery);
+      main.removeAttribute('srcset');
+      main.src = btn.dataset.gallerySrc;
+      $$('[data-gallery-src]', gallery).forEach((b) => b.classList.toggle('active', b === btn));
+    });
+  }
+
   // Pop-up da home (uma vez por visitante)
   const popup = $('[data-popup]');
   if (popup) {

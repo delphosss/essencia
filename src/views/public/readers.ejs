@@ -1,7 +1,8 @@
 <%- include('../partials/header') %>
 <section class="section">
   <div class="container">
-    <h1 class="page-title"><%= category ? category.name : 'Consulta de tarot online' %></h1>
+    <h1 class="page-title"><%= category ? `Tarot para ${category.name.toLowerCase()}` : 'Consulta de tarot online' %></h1>
+    <% if (category && category.description) { %><div class="intro prose center"><%- nl2p(category.description) %></div><% } %>
     <% if (site.promo_strip) { %><div class="promo-strip"><%= site.promo_strip %></div><% } %>
     <div class="chips">
       <a class="chip <%= !category ? 'active' : '' %>" href="/tarologos">Todos</a>

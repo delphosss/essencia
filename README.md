@@ -1,4 +1,4 @@
-# Arcano — plataforma de consultas de tarot online
+# Essência do Tarot — plataforma de consultas de tarot online
 
 Plataforma completa de consultas de tarot ao vivo, com três áreas:
 
@@ -6,9 +6,11 @@ Plataforma completa de consultas de tarot ao vivo, com três áreas:
 - **Tarólogo (atendente)**: fica online, recebe chamadas com campainha e WhatsApp, atende na sala, responde perguntas, gerencia a agenda, acompanha os ganhos e pede saques.
 - **Admin**: dashboard em tempo real, gestão de tarólogos, clientes, consultas, pedidos, saques, pacotes, cupons, moderação, conteúdo (banners, páginas, FAQ, blog, loja) e configurações.
 
-O levantamento funcional que originou o projeto e o mapa completo de funcionalidades estão em [`docs/FUNCIONALIDADES.md`](docs/FUNCIONALIDADES.md).
+Documentação:
+- [`docs/FUNCIONALIDADES.md`](docs/FUNCIONALIDADES.md) — mapa de funcionalidades por perfil e regras de negócio.
+- [`docs/OPERACAO.md`](docs/OPERACAO.md) — como configurar avisos, liberação de saldo, repasse e o checklist de produção.
 
-O nome "Arcano", os textos e o visual são provisórios e originais. Troque o nome em **Admin → Configurações** e o ícone em `public/img/icon.svg`.
+Nome, logo e favicon ficam em **Admin → Configurações**. O logo atual foi recortado de um print e é provisório: envie o arquivo original em alta resolução por lá.
 
 ## Stack
 
@@ -20,6 +22,8 @@ O nome "Arcano", os textos e o visual são provisórios e originais. Troque o no
 | Banco | SQLite (`better-sqlite3`), com o schema em `src/db/schema.sql` |
 | Pagamentos | Mercado Pago (Pix e Checkout Pro), PayPal Payments Standard (IPN) e um simulador para desenvolvimento |
 | Vídeo | Jitsi Meet (sala embutida, servidor configurável) |
+| Imagens | `sharp`: todo upload vira WebP com variantes de 400/800 px para `srcset` |
+| SEO | Meta tags, canonical, Open Graph, JSON-LD (Organization, Person, BlogPosting, Product, FAQPage, BreadcrumbList), sitemap com imagens, RSS do blog e redirecionamentos 301 das URLs antigas |
 | E-mail / WhatsApp | SMTP (nodemailer) e uma API HTTP no estilo Z-API. Sem configuração, as mensagens só vão para o log |
 
 ## Rodando localmente
@@ -38,6 +42,7 @@ No primeiro start, o seed cria:
 |---|---|---|
 | Admin | `admin@exemplo.com` | `admin123` (defina `ADMIN_EMAIL`/`ADMIN_PASSWORD` no `.env`) |
 | Cliente demo | `cliente@exemplo.com` | `cliente123` |
+| Dama da Noite (perfil da dona, 100% da casa) | `damadanoite@exemplo.com` (`OWNER_EMAIL`/`OWNER_PASSWORD`) | `tarot123` |
 | Tarólogos demo | `luna.arcana@exemplo.com` (e os outros em Admin → Tarólogos) | `tarot123` |
 
 Para não criar os dados de demonstração, use `SEED_DEMO=false`.
@@ -56,12 +61,17 @@ Sem `MP_ACCESS_TOKEN`, o checkout usa o **simulador de pagamento**. Ele gera um 
 npm test
 ```
 
-São 27 testes:
+São 32 testes:
 
-- **Unitários (26):** cobrança por minuto, saldo esgotado, desconexão, pausa, chamada perdida, repetição do WhatsApp, bônus de primeira compra, cupons, idempotência do pagamento, estorno, assinatura do webhook, perguntas, agenda, depoimentos, saques, mensagens e notificações.
-- **Ponta a ponta (1):** servidor HTTP real e clientes Socket.io percorrendo cadastro → compra → chamada → chat → cobrança → encerramento → avaliação.
+- **Unitários:** cobrança por minuto, saldo esgotado, desconexão, pausa, chamada perdida, repetição do WhatsApp, repasse de 30% e 100% no perfil da dona, bônus de primeira compra, cupons, idempotência do pagamento, estorno, assinatura do webhook, perguntas, agenda, depoimentos, saques, mensagens e notificações.
+- **HTTP:** redirecionamentos 301 das URLs antigas, canonical, Open Graph, JSON-LD, noindex, sitemap e RSS; loja com dados do trabalho, pagamento com saldo e andamento.
+- **Ponta a ponta:** servidor real e clientes Socket.io percorrendo cadastro → compra → chamada → chat → cobrança → encerramento → avaliação.
+
+**Desempenho (Lighthouse, modo produção):** 100 em desempenho, acessibilidade, boas práticas e SEO na home, no perfil, no post do blog e no produto da loja (LCP de cerca de 1,4 s).
 
 ## Produção
+
+O passo a passo completo, com webhooks, WhatsApp, e-mail, Nginx e Search Console, está em [`docs/OPERACAO.md`](docs/OPERACAO.md). Resumo:
 
 1. **`.env`:**
    - `NODE_ENV=production`, `BASE_URL` com HTTPS e um `SESSION_SECRET` forte.

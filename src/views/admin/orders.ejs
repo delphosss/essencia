@@ -14,7 +14,7 @@
     <% rows.forEach((o) => { %>
       <tr><td><a href="/admin/pedidos/<%= o.id %>">#<%= o.id %></a></td><td><%= fmtDateTime(o.created_at) %></td><td><a href="/admin/clientes/<%= o.user_id %>"><%= o.user_name %></a></td>
       <td><%= o.kind === 'credits' ? (o.package_name || 'Créditos') : 'Loja' %></td><td><%= money(o.total_cents) %></td><td><%= o.kind === 'credits' ? money(o.credit_cents) : '—' %></td>
-      <td><%= o.method || '—' %></td><td><%- include('../partials/status-label', { s: o.status }) %></td><td class="mono small"><%= o.gateway_ref || '' %></td></tr>
+      <td><%= o.method || '—' %></td><td><%- include('../partials/status-label', { s: o.status }) %><% if (o.kind === 'store' && o.fulfillment_status) { %><br><span class="small muted"><%= { received: 'Recebido', in_progress: 'Em andamento', done: 'Concluído' }[o.fulfillment_status] %></span><% } %></td><td class="mono small"><%= o.gateway_ref || '' %></td></tr>
     <% }) %>
   </tbody>
 </table></div>

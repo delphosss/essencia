@@ -1,14 +1,28 @@
 <%- include('../partials/header') %>
 <section class="section">
   <div class="container product-page">
-    <div class="product-img product-img-lg" <% if (product.image) { %>style="background-image:url('<%= product.image %>')"<% } %>>
-      <% if (product.compare_at_cents > product.price_cents) { %><span class="package-badge">Oferta</span><% } %>
+    <div class="product-gallery" data-gallery>
+      <div class="product-img product-img-lg">
+        <% if (gallery.length) { %><img data-gallery-main src="<%= gallery[0] %>" srcset="<%= srcset(gallery[0], 1200) %>" sizes="(max-width: 900px) 100vw, 560px" alt="<%= product.name %>" fetchpriority="high"><% } %>
+        <% if (product.compare_at_cents > product.price_cents) { %><span class="package-badge">Oferta</span><% } %>
+      </div>
+      <% if (gallery.length > 1) { %>
+        <div class="gallery-thumbs">
+          <% gallery.forEach((src, i) => { %><button type="button" data-gallery-src="<%= src %>" class="<%= i === 0 ? 'active' : '' %>"><img src="<%= src %>" alt="Imagem <%= i + 1 %> de <%= product.name %>" loading="lazy"></button><% }) %>
+        </div>
+      <% } %>
     </div>
     <div>
       <h1 class="page-title left"><%= product.name %></h1>
       <% if (product.sku) { %><p class="muted small">Código: <%= product.sku %></p><% } %>
       <p class="product-price"><% if (product.compare_at_cents > product.price_cents) { %><s class="muted"><%= money(product.compare_at_cents) %></s> <% } %><strong><%= money(product.price_cents) %></strong></p>
       <p><%= product.summary %></p>
+      <ul class="plain product-facts">
+        <% if (product.delivery_days) { %><li>Prazo de realização: até <strong><%= product.delivery_days %> dia(s)</strong> após a confirmação do pagamento</li><% } %>
+        <% if (product.requires_details) { %><li>No fechamento do pedido você informa os nomes, as datas de nascimento e a sua intenção</li><% } %>
+        <li>Acompanhe o andamento em Minha conta → Pedidos da loja</li>
+        <li>Pague com Pix, cartão, PayPal ou com o seu saldo de créditos</li>
+      </ul>
       <form method="post" action="/carrinho" class="toolbar">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <input type="hidden" name="product_id" value="<%= product.id %>">
@@ -16,8 +30,18 @@
         <button class="btn btn-gold">Comprar</button>
       </form>
       <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="https://wa.me/?text=<%= encodeURIComponent(`${product.name} ${shareUrl}`) %>">Compartilhar no WhatsApp</a>
-      <div class="prose"><%- product.description %></div>
+      <div class="prose product-desc"><%- product.description %></div>
     </div>
   </div>
+  <% if (related.length) { %>
+    <div class="container">
+      <h2 class="section-title left">Você também pode gostar</h2>
+      <div class="grid grid-3">
+        <% related.forEach((p) => { %>
+          <a class="card card-body related-product" href="/loja/produto/<%= p.slug %>"><strong><%= p.name %></strong><span class="price"><%= money(p.price_cents) %></span></a>
+        <% }) %>
+      </div>
+    </div>
+  <% } %>
 </section>
 <%- include('../partials/footer') %>

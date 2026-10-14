@@ -16,6 +16,11 @@ module.exports = {
     email: env.ADMIN_EMAIL || 'admin@exemplo.com',
     password: env.ADMIN_PASSWORD || 'admin123',
   },
+  // Perfil de atendimento da dona do site (100% do valor fica com a casa).
+  owner: {
+    email: env.OWNER_EMAIL || 'damadanoite@exemplo.com',
+    password: env.OWNER_PASSWORD || 'tarot123',
+  },
   mercadoPago: {
     accessToken: env.MP_ACCESS_TOKEN || '',
     webhookSecret: env.MP_WEBHOOK_SECRET || '',

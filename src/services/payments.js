@@ -80,7 +80,7 @@ module.exports = function createPayments(ctx) {
     return getOrder(orderId);
   }
 
-  function createStoreOrder(userId, items, shipping) {
+  function createStoreOrder(userId, items, shipping, details) {
     if (!items.length) throw new HttpError(400, 'Carrinho vazio');
     const products = items.map(({ productId, quantity }) => {
       const p = db.prepare('SELECT * FROM products WHERE id = ? AND active = 1').get(productId);
@@ -89,8 +89,8 @@ module.exports = function createPayments(ctx) {
     });
     const total = products.reduce((s, { p, quantity }) => s + p.price_cents * quantity, 0);
     return db.transaction(() => {
-      const { lastInsertRowid } = db.prepare(`INSERT INTO orders (user_id, kind, subtotal_cents, total_cents, shipping_json)
-        VALUES (?, 'store', ?, ?, ?)`).run(userId, total, total, shipping ? JSON.stringify(shipping) : null);
+      const { lastInsertRowid } = db.prepare(`INSERT INTO orders (user_id, kind, subtotal_cents, total_cents, shipping_json, details_json)
+        VALUES (?, 'store', ?, ?, ?, ?)`).run(userId, total, total, shipping ? JSON.stringify(shipping) : null, details && details.length ? JSON.stringify(details) : null);
       const ins = db.prepare('INSERT INTO order_items (order_id, product_id, name, price_cents, quantity) VALUES (?, ?, ?, ?, ?)');
       for (const { p, quantity } of products) ins.run(lastInsertRowid, p.id, p.name, p.price_cents, quantity);
       return getOrder(lastInsertRowid);
@@ -125,6 +125,7 @@ module.exports = function createPayments(ctx) {
         ctx.wallet.credit(order.user_id, order.bonus_cents, 'bonus', `Bônus da compra #${order.id}`, { type: 'order', id: order.id });
       }
     }
+    if (order.kind === 'store') db.prepare("UPDATE orders SET fulfillment_status = 'received' WHERE id = ?").run(orderId);
     if (order.coupon_id) {
       db.prepare('UPDATE coupons SET uses = uses + 1 WHERE id = ?').run(order.coupon_id);
       db.prepare('INSERT INTO coupon_redemptions (coupon_id, user_id, order_id) VALUES (?, ?, ?)').run(order.coupon_id, order.user_id, order.id);
@@ -148,6 +149,40 @@ module.exports = function createPayments(ctx) {
       }
     }
     return order;
+  }
+
+  // Pedido da loja pago com o saldo de créditos da carteira.
+  const payWithWallet = db.transaction((orderId, userId) => {
+    const order = getOrder(orderId);
+    if (!order || order.user_id !== userId || order.kind !== 'store' || order.status !== 'pending') throw new HttpError(400, 'Pedido indisponível');
+    ctx.wallet.debit(userId, order.total_cents, 'store', `Pedido da loja #${order.id}`, { type: 'order', id: order.id });
+    return order;
+  });
+
+  function payStoreWithWallet(orderId, userId) {
+    payWithWallet(orderId, userId);
+    return markPaid(orderId, { method: 'wallet', gatewayRef: `saldo-${orderId}` });
+  }
+
+  const FULFILLMENT = { received: 'Recebido', in_progress: 'Em andamento', done: 'Concluído' };
+
+  function setFulfillment(orderId, status, note) {
+    if (!FULFILLMENT[status]) throw new HttpError(400, 'Status inválido');
+    const order = getOrder(orderId);
+    if (!order || order.kind !== 'store' || order.status !== 'paid') throw new HttpError(400, 'Só pedidos pagos da loja');
+    db.prepare('UPDATE orders SET fulfillment_status = ?, fulfillment_note = ? WHERE id = ?').run(status, note || null, orderId);
+    ctx.notifications.notify(order.user_id, {
+      title: `Pedido #${order.id}: ${FULFILLMENT[status]}`,
+      body: note || '',
+      link: '/minha-conta/pedidos-loja',
+    });
+    if (note || status === 'done') {
+      ctx.messaging.sendEmail({
+        to: order.user_email,
+        subject: `Seu pedido #${order.id} está ${FULFILLMENT[status].toLowerCase()}`,
+        text: `Olá, ${order.user_name}!\n\n${note || 'Seu pedido foi atualizado.'}\n\nAcompanhe em ${ctx.config.baseUrl}/minha-conta/pedidos-loja`,
+      });
+    }
   }
 
   function cancel(orderId) {
@@ -312,7 +347,7 @@ module.exports = function createPayments(ctx) {
   }
 
   return {
-    sandbox, quoteCredits, createCreditOrder, applyCoupon, createStoreOrder, getOrder, orderItems, describe,
+    sandbox, quoteCredits, payStoreWithWallet, setFulfillment, FULFILLMENT, createCreditOrder, applyCoupon, createStoreOrder, getOrder, orderItems, describe,
     markPaid, cancel, refund, startPix, startCard, paypalForm, handleMercadoPagoWebhook, handlePaypalIpn,
     hasPaidCreditOrder, verifyMpSignature,
   };

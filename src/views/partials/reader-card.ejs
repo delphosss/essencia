@@ -1,6 +1,6 @@
 <% const r = locals.r; %>
 <article class="reader-card" data-reader-id="<%= r.id %>" data-status="<%= r.status %>">
-  <a href="/tarologo/<%= r.slug %>" class="reader-card-photo">
+  <a href="/tarologo/<%= r.slug %>" class="reader-card-photo" aria-label="Ver perfil de <%= r.display_name %>">
     <%- include('avatar', { photo: r.photo, name: r.display_name, size: 'avatar-lg' }) %>
   </a>
   <h3 class="reader-card-name"><a href="/tarologo/<%= r.slug %>"><%= r.display_name %></a></h3>

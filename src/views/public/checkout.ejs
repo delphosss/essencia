@@ -8,6 +8,7 @@
       <% if (items.length) { %>
         <ul><% items.forEach((i) => { %><li><%= i.quantity %>× <%= i.name %> — <%= money(i.price_cents * i.quantity) %></li><% }) %></ul>
       <% } %>
+      <% details.forEach((d) => { %><p class="muted small"><strong><%= d.product %>:</strong> <%= d.people %><%= d.birthdates ? ` (${d.birthdates})` : '' %> — <%= d.intention %></p><% }) %>
       <dl class="totals">
         <dt>Subtotal</dt><dd><%= money(order.subtotal_cents) %></dd>
         <% if (order.discount_cents) { %><dt>Desconto<%= coupon ? ` (${coupon.code})` : '' %></dt><dd>− <%= money(order.discount_cents) %></dd><% } %>
@@ -32,6 +33,7 @@
       <button type="button" class="tab active" data-tab="pix">Pix</button>
       <button type="button" class="tab" data-tab="card">Cartão de crédito</button>
       <% if (paypal) { %><button type="button" class="tab" data-tab="paypal">PayPal</button><% } %>
+      <% if (order.kind === 'store') { %><button type="button" class="tab" data-tab="wallet">Saldo da conta</button><% } %>
     </div>
 
     <div class="tab-panel card card-body" data-panel="pix">
@@ -55,6 +57,16 @@
       <div class="pay-badges"><span>Visa</span><span>Mastercard</span><span>Elo</span><span>Amex</span><span>Hipercard</span></div>
     </div>
 
+    <% if (order.kind === 'store') { %>
+    <div class="tab-panel card card-body" data-panel="wallet" hidden>
+      <p>Seu saldo de créditos: <strong><%= money(balance) %></strong></p>
+      <% if (balance >= order.total_cents) { %>
+        <form method="post" action="/pagamento/<%= order.id %>/saldo" data-confirm="Pagar <%= money(order.total_cents) %> com o seu saldo?">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-gold">Pagar com saldo</button>
+        </form>
+      <% } else { %><p class="muted">Saldo insuficiente para este pedido. Escolha outra forma de pagamento.</p><% } %>
+    </div>
+    <% } %>
     <% if (paypal) { %>
     <div class="tab-panel card card-body" data-panel="paypal" hidden>
       <p>Ideal para quem está fora do Brasil.</p>

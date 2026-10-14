@@ -23,6 +23,7 @@ function createContext(overrides = {}) {
     } catch (_) { /* ignora falha de log */ }
     if (!ctx.quiet) console.error(`[${source}] ${message}`);
   };
+  ctx.images = require('./services/images')(ctx);
   ctx.wallet = require('./services/wallet')(ctx);
   ctx.notifications = require('./services/notifications')(ctx);
   ctx.messaging = require('./services/messaging')(ctx);

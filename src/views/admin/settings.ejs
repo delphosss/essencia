@@ -1,10 +1,20 @@
 <%- include('../partials/admin-top') %>
 <% const v = values; const chk = (k) => (v[k] === '1' ? 'checked' : ''); %>
-<form method="post" action="/admin/configuracoes" class="form">
+<form method="post" action="/admin/configuracoes" class="form" enctype="multipart/form-data">
   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
   <div class="grid grid-2">
     <fieldset class="card card-body fieldset"><legend>Site</legend>
       <label class="field"><span>Nome do site</span><input class="input" name="site_name" value="<%= v.site_name %>"></label>
+      <div class="field"><span>Logo (PNG/SVG/WEBP com fundo transparente, ideal 600×180)</span>
+        <% if (v.site_logo) { %><img src="<%= v.site_logo %>" alt="" class="thumb"><% } %>
+        <input class="input" type="file" name="logo_file" accept="image/*">
+        <label class="small muted">Caminho atual <input class="input" name="site_logo" value="<%= v.site_logo %>"></label>
+      </div>
+      <div class="field"><span>Ícone / favicon (quadrado)</span>
+        <% if (v.site_favicon) { %><img src="<%= v.site_favicon %>" alt="" class="thumb" style="max-height:48px"><% } %>
+        <input class="input" type="file" name="favicon_file" accept="image/*">
+        <label class="small muted">Caminho atual <input class="input" name="site_favicon" value="<%= v.site_favicon %>"></label>
+      </div>
       <label class="field"><span>Frase de apresentação</span><input class="input" name="site_tagline" value="<%= v.site_tagline %>"></label>
       <label class="field"><span>Faixa promocional (lista de tarólogos)</span><input class="input" name="promo_strip" value="<%= v.promo_strip %>"></label>
       <label class="field"><span>E-mail de suporte</span><input class="input" name="support_email" value="<%= v.support_email %>"></label>
@@ -29,7 +39,7 @@
       <label class="field"><span>Preço padrão do chat (R$/min) — novos tarólogos</span><input class="input" name="default_price_chat_cents" value="<%= centsToInput(v.default_price_chat_cents) %>"></label>
       <label class="field"><span>Preço padrão do vídeo (R$/min)</span><input class="input" name="default_price_video_cents" value="<%= centsToInput(v.default_price_video_cents) %>"></label>
       <label class="field"><span>Preço padrão da pergunta (R$)</span><input class="input" name="default_price_question_cents" value="<%= centsToInput(v.default_price_question_cents) %>"></label>
-      <label class="field"><span>Repasse padrão ao tarólogo (%)</span><input class="input" type="number" name="default_commission_percent" value="<%= v.default_commission_percent %>"></label>
+      <label class="field"><span>Repasse padrão ao tarólogo (%) — o restante é do site</span><input class="input" type="number" name="default_commission_percent" value="<%= v.default_commission_percent %>"></label>
       <label class="field"><span>Saque mínimo (R$)</span><input class="input" name="withdrawal_min_cents" value="<%= centsToInput(v.withdrawal_min_cents) %>"></label>
       <label class="field"><span>Saldo mínimo para iniciar (em minutos)</span><input class="input" type="number" name="min_balance_minutes" value="<%= v.min_balance_minutes %>"></label>
       <label class="field"><span>Máximo de perguntas por envio</span><input class="input" type="number" name="question_max_per_order" value="<%= v.question_max_per_order %>"></label>

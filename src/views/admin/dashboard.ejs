@@ -8,7 +8,9 @@
   <div class="kpi"><span>Chamadas perdidas (30 dias)</span><strong><%= kpi.missed30 %></strong></div>
   <div class="kpi"><span>Novos clientes (30 dias)</span><strong><%= kpi.newClients30 %></strong></div>
   <div class="kpi"><span>Saldo em carteiras</span><strong><%= money(kpi.walletTotal) %></strong></div>
-  <div class="kpi"><span>A pagar aos tarólogos</span><strong><%= money(kpi.payable) %></strong></div>
+  <div class="kpi"><span>Receita do site (30 dias)</span><strong><%= money(kpi.siteRevenue30) %></strong><small>consultas e perguntas, já sem o repasse</small></div>
+  <div class="kpi"><span>Repasse aos tarólogos (30 dias)</span><strong><%= money(kpi.readerShare30) %></strong></div>
+  <div class="kpi"><span>Saldo a pagar aos tarólogos</span><strong><%= money(kpi.payable) %></strong></div>
   <div class="kpi"><span>Tarólogos online</span><strong data-online-count><%= kpi.readersOnline %></strong></div>
 </div>
 

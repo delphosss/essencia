@@ -132,7 +132,7 @@ module.exports = function readerRoutes(ctx) {
       chat_enabled: b.chat_enabled ? 1 : 0,
       questions_enabled: b.questions_enabled ? 1 : 0,
     };
-    if (req.file) fields.photo = `/uploads/${req.file.filename}`;
+    if (req.file) fields.photo = await ctx.images.store(req.file, { square: 600 });
     if (settings.get('readers_can_set_prices')) {
       Object.assign(fields, {
         price_chat_cents: Math.max(1, parseMoney(b.price_chat)),

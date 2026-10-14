@@ -2,13 +2,21 @@ const path = require('path');
 const express = require('express');
 const session = require('express-session');
 const helmet = require('helmet');
+const compression = require('compression');
+const { createAssets } = require('./lib/assets');
 const SqliteStore = require('./lib/session-store');
+const { redirects } = require('./lib/redirects');
+const { createSeo } = require('./lib/seo');
 const { csrf } = require('./lib/middleware');
 const util = require('./lib/util');
 
 function createApp(ctx) {
   const app = express();
   const { db, settings, config } = ctx;
+  const seo = createSeo(ctx);
+  ctx.seo = seo;
+  // Áreas que não devem aparecer no Google.
+  const PRIVATE = /^\/(admin|atendente|minha-conta|pagamento|sala|chamando|mensagens|carrinho|entrar|cadastro|esqueci-senha|redefinir-senha|auth)(\/|$)/;
 
   app.set('view engine', 'ejs');
   app.set('views', path.join(__dirname, 'views'));
@@ -16,8 +24,16 @@ function createApp(ctx) {
   app.disable('x-powered-by');
 
   app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
-  app.use('/public', express.static(path.join(config.root, 'public'), { maxAge: config.isProduction ? '7d' : 0 }));
-  app.use('/uploads', express.static(config.uploadDir, { maxAge: '30d' }));
+  app.use(compression()); // gzip/brotli em HTML, CSS, JS e JSON
+  const asset = createAssets(config.root);
+  // Arquivos versionados (?v=hash) podem ficar 1 ano em cache; o nome muda quando o conteúdo muda.
+  app.use('/public', express.static(path.join(config.root, 'public'), {
+    setHeaders: (res, file, stat) => res.setHeader('Cache-Control', config.isProduction ? 'public, max-age=31536000, immutable' : 'no-cache'),
+  }));
+  // Uploads têm nome único por arquivo gerado: também podem ser imutáveis.
+  app.use('/uploads', express.static(config.uploadDir, { maxAge: '365d', immutable: true }));
+
+  app.use(redirects(db));
 
   // Webhooks antes do CSRF e com corpo bruto (PayPal IPN exige o corpo original).
   app.use('/webhooks', require('./routes/webhooks')(ctx));
@@ -58,6 +74,16 @@ function createApp(ctx) {
       reader: req.reader || null,
       site: settings.all(),
       settings,
+      srcset: ctx.images.srcset,
+      seo,
+      asset,
+      baseUrl: config.baseUrl,
+      jsonld: [],
+      breadcrumbs: null,
+      ogImage: null,
+      ogType: 'website',
+      canonical: null,
+      noindex: PRIVATE.test(req.path),
       flash,
       path: req.path,
       originalPath: req.originalUrl.split('?')[0].replace(/\/$/, '') || '/',

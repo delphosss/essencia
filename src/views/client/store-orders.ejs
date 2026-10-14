@@ -5,6 +5,10 @@
   <div class="card card-body">
     <div class="toolbar between"><strong>Pedido #<%= o.id %></strong><span><%= fmtDateTime(o.created_at) %></span><%- include('../partials/status-label', { s: o.status }) %></div>
     <ul><% o.items.forEach((i) => { %><li><%= i.quantity %>× <%= i.name %> — <%= money(i.price_cents * i.quantity) %></li><% }) %></ul>
+    <% if (o.status === 'paid') { %>
+      <p>Andamento: <strong><%= { received: 'Recebido', in_progress: 'Em andamento', done: 'Concluído' }[o.fulfillment_status] || 'Recebido' %></strong></p>
+      <% if (o.fulfillment_note) { %><div class="alert alert-info"><%= o.fulfillment_note %></div><% } %>
+    <% } %>
     <p>Total: <strong><%= money(o.total_cents) %></strong></p>
     <% if (o.status === 'pending') { %><a class="btn btn-gold btn-sm" href="/pagamento/<%= o.id %>">Pagar agora</a><% } %>
   </div>

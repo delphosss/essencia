@@ -27,7 +27,7 @@ function makeClient(ctx, { email = `c${Math.random().toString(36).slice(2)}@t.co
 }
 
 function firstReader(ctx) {
-  return ctx.db.prepare('SELECT r.*, u.email FROM readers r JOIN users u ON u.id = r.user_id ORDER BY r.id LIMIT 1').get();
+  return ctx.db.prepare('SELECT r.*, u.email FROM readers r JOIN users u ON u.id = r.user_id WHERE r.is_owner = 0 ORDER BY r.id LIMIT 1').get();
 }
 
 function eventsOf(ctx, event) {

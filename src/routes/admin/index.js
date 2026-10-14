@@ -22,6 +22,12 @@ module.exports = function adminRoutes(ctx) {
     next();
   });
 
+  // Upload de imagem do editor visual (blog, produtos, páginas).
+  router.post('/upload-imagem', upload.single('image'), action(async (req, res) => {
+    if (!req.file) throw new HttpError(400, 'Envie uma imagem');
+    res.json({ url: await ctx.images.store(req.file, { maxWidth: 1200 }) });
+  }));
+
   // ---- Dashboard ---------------------------------------------------------------
   router.get('/', (req, res) => {
     const one = (sql, ...p) => db.prepare(sql).get(...p);
@@ -36,7 +42,14 @@ module.exports = function adminRoutes(ctx) {
       missed30: one("SELECT COUNT(*) n FROM consultations WHERE status = 'missed' AND called_at >= ?", since(30)).n,
       newClients30: one("SELECT COUNT(*) n FROM users WHERE role = 'client' AND created_at >= ?", since(30)).n,
       walletTotal: one("SELECT COALESCE(SUM(balance_cents),0) s FROM users WHERE role = 'client'").s,
-      payable: one('SELECT COALESCE(SUM(net_cents),0) s FROM reader_earnings').s,
+      // A pagar: saldo dos tarólogos (o perfil da dona não entra; o dela é receita da casa).
+      payable: one('SELECT COALESCE(SUM(e.net_cents),0) s FROM reader_earnings e JOIN readers r ON r.id = e.reader_id WHERE r.is_owner = 0').s,
+      // Receita do site: parte da casa nas consultas/perguntas (70% padrão) + 100% do perfil da dona.
+      siteRevenue30: one(`SELECT COALESCE(SUM(CASE WHEN r.is_owner = 1 THEN e.gross_cents ELSE e.gross_cents - e.net_cents END),0) s
+        FROM reader_earnings e JOIN readers r ON r.id = e.reader_id
+        WHERE e.source_type IN ('consultation','question') AND e.created_at >= ?`, since(30)).s,
+      readerShare30: one(`SELECT COALESCE(SUM(e.net_cents),0) s FROM reader_earnings e JOIN readers r ON r.id = e.reader_id
+        WHERE r.is_owner = 0 AND e.source_type IN ('consultation','question') AND e.created_at >= ?`, since(30)).s,
       readersOnline: one("SELECT COUNT(*) n FROM readers WHERE status != 'offline' AND active = 1").n,
       pendingOrders: one("SELECT COUNT(*) n FROM orders WHERE status = 'pending' AND created_at >= ?", since(2)).n,
     };
@@ -119,14 +132,17 @@ module.exports = function adminRoutes(ctx) {
         chat_enabled: b.chat_enabled ? 1 : 0,
         video_enabled: b.video_enabled ? 1 : 0,
         questions_enabled: b.questions_enabled ? 1 : 0,
-        commission_percent: Math.min(100, Math.max(0, toInt(b.commission_percent, 50))),
+        commission_percent: b.is_owner ? 100 : Math.min(100, Math.max(0, toInt(b.commission_percent, settings.get('default_commission_percent')))),
         whatsapp: String(b.whatsapp || '').replace(/[^\d+]/g, ''),
         pix_key: String(b.pix_key || ''),
         featured: b.featured ? 1 : 0,
+        meta_title: String(b.meta_title || '').slice(0, 80) || null,
+        meta_description: String(b.meta_description || '').slice(0, 200) || null,
+        is_owner: b.is_owner ? 1 : 0,
         sort_order: toInt(b.sort_order),
         active: b.active ? 1 : 0,
       };
-      if (req.file) fields.photo = `/uploads/${req.file.filename}`;
+      if (req.photo) fields.photo = req.photo;
       const keys = Object.keys(fields);
       if (reader) {
         db.prepare(`UPDATE readers SET ${keys.map((k) => `${k} = ?`).join(', ')} WHERE id = ?`).run(...keys.map((k) => fields[k]), reader.id);
@@ -143,12 +159,14 @@ module.exports = function adminRoutes(ctx) {
   }
 
   router.post('/tarologos', upload.single('photo'), action(async (req, res) => {
+    if (req.file) req.photo = await ctx.images.store(req.file, { square: 600 });
     const id = saveReader(req, null);
     flash(req, 'success', 'Tarólogo cadastrado.');
     res.redirect(`/admin/tarologos/${id}`);
   }));
 
   router.post('/tarologos/:id(\\d+)', upload.single('photo'), action(async (req, res) => {
+    if (req.file) req.photo = await ctx.images.store(req.file, { square: 600 });
     const id = saveReader(req, toInt(req.params.id));
     const r = db.prepare('SELECT * FROM readers WHERE id = ?').get(id);
     if (!r.active && r.status !== 'offline' && !ctx.consultations.activeFor({ readerId: id })) ctx.consultations.setReaderStatus(id, 'offline');
@@ -270,6 +288,7 @@ module.exports = function adminRoutes(ctx) {
     if (req.params.acao === 'aprovar') ctx.payments.markPaid(id, { method: 'manual', gatewayRef: String(req.body.ref || 'manual') });
     else if (req.params.acao === 'cancelar') ctx.payments.cancel(id);
     else if (req.params.acao === 'estornar') ctx.payments.refund(id);
+    else if (req.params.acao === 'andamento') ctx.payments.setFulfillment(id, req.body.fulfillment_status, String(req.body.fulfillment_note || '').slice(0, 2000));
     else if (req.params.acao === 'nota') ctx.db.prepare('UPDATE orders SET notes = ? WHERE id = ?').run(String(req.body.notes || ''), id);
     else throw new HttpError(400, 'Ação inválida');
     flash(req, 'success', 'Pedido atualizado.');
@@ -403,8 +422,9 @@ module.exports = function adminRoutes(ctx) {
   // ---- Configurações -------------------------------------------------------------
   router.get('/configuracoes', (req, res) => res.render('admin/settings', { title: 'Configurações', values: settings.all(), env: ctx.config }));
 
-  router.post('/configuracoes', action(async (req, res) => {
+  router.post('/configuracoes', upload.fields([{ name: 'logo_file', maxCount: 1 }, { name: 'favicon_file', maxCount: 1 }]), action(async (req, res) => {
     const values = {};
+    const files = req.files || {};
     for (const key of Object.keys(settings.DEFAULTS)) {
       if (!(key in req.body) && !/_enabled$|^reviews_|^comments_|^readers_can|^chat_block/.test(key)) continue;
       let v = req.body[key];
@@ -413,6 +433,9 @@ module.exports = function adminRoutes(ctx) {
       else if (settings.isNumeric(key)) v = toInt(v);
       values[key] = v;
     }
+    // Arquivo enviado tem prioridade sobre o caminho digitado.
+    if (files.logo_file) values.site_logo = await ctx.images.store(files.logo_file[0], { maxWidth: 600, format: 'webp' });
+    if (files.favicon_file) values.site_favicon = await ctx.images.store(files.favicon_file[0], { square: 192, format: 'png' });
     settings.set(values);
     flash(req, 'success', 'Configurações salvas.');
     res.redirect('/admin/configuracoes');

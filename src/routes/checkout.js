@@ -28,6 +28,8 @@ module.exports = function checkoutRoutes(ctx) {
       description: payments.describe(order),
       coupon: order.coupon_id ? ctx.db.prepare('SELECT code FROM coupons WHERE id = ?').get(order.coupon_id) : null,
       paypal: payments.paypalForm(order),
+      balance: ctx.wallet.balance(req.user.id),
+      details: JSON.parse(order.details_json || '[]'),
       sandbox: payments.sandbox(),
     });
   }, { back: '/minha-conta/compras' }));
@@ -37,6 +39,12 @@ module.exports = function checkoutRoutes(ctx) {
     payments.applyCoupon(order.id, req.user.id, String(req.body.coupon || '').trim() || null);
     flash(req, 'success', req.body.coupon ? 'Cupom aplicado.' : 'Cupom removido.');
     res.redirect(`/pagamento/${order.id}`);
+  }, { back: (req) => `/pagamento/${req.params.id}` }));
+
+  router.post('/pagamento/:id/saldo', requireAuth('client'), action(async (req, res) => {
+    const order = ownOrder(req);
+    payments.payStoreWithWallet(order.id, req.user.id);
+    res.redirect(`/pagamento/${order.id}/retorno`);
   }, { back: (req) => `/pagamento/${req.params.id}` }));
 
   router.post('/pagamento/:id/pix', requireAuth(), action(async (req, res) => {

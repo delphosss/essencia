@@ -6,30 +6,7 @@ const { createContext } = require('../src/context');
 const { createApp } = require('../src/app');
 const { attachRealtime } = require('../src/realtime');
 const { seed } = require('../src/db/seed');
-
-// Navegador mínimo: guarda cookies e lê o token CSRF das páginas.
-function browser(base) {
-  const jar = new Map();
-  let csrf = '';
-  const cookie = () => [...jar].map(([k, v]) => `${k}=${v}`).join('; ');
-  async function req(path, { form, json, method = form || json ? 'POST' : 'GET' } = {}) {
-    const headers = { cookie: cookie() };
-    let body;
-    if (form) { headers['content-type'] = 'application/x-www-form-urlencoded'; body = new URLSearchParams({ _csrf: csrf, ...form }).toString(); }
-    if (json) { headers['content-type'] = 'application/json'; headers.accept = 'application/json'; headers['x-csrf-token'] = csrf; body = JSON.stringify(json); }
-    const res = await fetch(base + path, { method, headers, body, redirect: 'manual' });
-    for (const c of res.headers.getSetCookie()) {
-      const [pair] = c.split(';');
-      const i = pair.indexOf('=');
-      jar.set(pair.slice(0, i), pair.slice(i + 1));
-    }
-    const text = await res.text();
-    const m = text.match(/name="csrf-token" content="([^"]+)"/);
-    if (m) csrf = m[1];
-    return { status: res.status, location: res.headers.get('location'), text, json: () => JSON.parse(text) };
-  }
-  return { req, cookie, setCsrf: (t) => { csrf = t; } };
-}
+const { browser } = require('./web');
 
 function once(socket, event, timeout = 4000) {
   return new Promise((resolve, reject) => {

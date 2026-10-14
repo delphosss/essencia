@@ -100,7 +100,7 @@ As respostas abaixo cobrem as "Dúvidas" do levantamento. Todas podem ser ajusta
 
 | Dúvida | Decisão adotada |
 |---|---|
-| Comissão e repasse | Percentual **por tarólogo** (padrão 50%) sobre o valor cobrado de consultas e perguntas. Saque por Pix, mínimo de R$ 50, aprovado manualmente pelo admin |
+| Comissão e repasse | **30% para o tarólogo e 70% para o site** (padrão configurável, ajustável por tarólogo). O perfil da dona (**Dama da Noite**) fica com 100% para a casa, sem repasse. Saque por Pix, mínimo de R$ 50, aprovado manualmente pelo admin |
 | Validade dos créditos | Os créditos não expiram |
 | Tempo mínimo | É preciso ter saldo para pelo menos 1 minuto (configurável) |
 | Minuto cheio ou fracionado | **Minuto iniciado**: o 1º é cobrado quando os dois entram na sala e os seguintes a cada 60 s de tempo faturável |
@@ -117,7 +117,21 @@ As respostas abaixo cobrem as "Dúvidas" do levantamento. Todas podem ser ajusta
 | Chamada | 4 min para aceitar; campainha de 60 s; WhatsApp a cada 30 s (máx. 4 envios); um chamado por vez por tarólogo |
 | Cancelamento de agendamento | Pelo site com ≥ 24 h de antecedência; depois disso, pelo suporte |
 
-## 6. Diferenças em relação ao original
+## 6. SEO, blog, loja e desempenho
+
+| Item | Como está |
+|---|---|
+| Migração de URLs | Redirecionamento 301 automático de todas as URLs do site antigo (`/terapeutas/`, `/terapeuta/{slug}/`, `/comprar-saldo/`, `/blog-artigo/{cat}/{slug}/`, `/blog/{cat}/`, `/loja-item/{cat}/{slug}/`, `/faleconosco/`, `/registre-se/`, `/minha-conta/?pg=…` etc.) e remoção da barra final. Redirecionamentos extras em **Admin → Redirecionamentos** (com contador de acessos) |
+| Meta tags | Título e descrição por página. Campos "Título/Descrição para o Google" em tarólogos, posts e produtos. Canonical, Open Graph, Twitter Card; `noindex` nas áreas logadas, no checkout e em buscas |
+| Dados estruturados | Organization e WebSite (home), Person com oferta de preço (tarólogo), BlogPosting (post), Product com preço (loja), FAQPage (como consultar), BreadcrumbList (todas as páginas internas) |
+| Sitemap e robots | `sitemap.xml` com categorias, tarólogos, posts (com `lastmod`), produtos e imagens; `robots.txt` bloqueando áreas privadas |
+| Conteúdo para SEO | Texto de apresentação nas categorias de tarólogos, do blog e da loja, exibido no topo da página |
+| Blog | Editor visual (com upload de imagem otimizada), autor, data de atualização, tempo de leitura, "Leia também", chamada para consulta, comentários moderados, paginação com canonical e feed RSS (`/blog/feed.xml`) |
+| Loja de serviços espirituais | Galeria de imagens, prazo de realização, **dados do trabalho no checkout** (pessoas, datas de nascimento, intenção), pagamento com Pix, cartão, PayPal **ou saldo de créditos**, andamento (Recebido → Em andamento → Concluído) com mensagem ao cliente por notificação e e-mail |
+| Imagens | Uploads convertidos para WebP, em várias larguras, com `srcset`, `loading=lazy` e cache de 1 ano |
+| Carregamento | Compressão Brotli/gzip (HTML de 26 KB → 5 KB), CSS/JS versionados com cache de 1 ano, scripts com `defer`, fontes sem bloquear a renderização, preload do logo. Lighthouse 100/100/100/100 |
+
+## 7. Diferenças em relação ao original
 
 - **Plataforma única.** O original é um SaaS multi-tenant (vários sites por `site_id`); aqui é uma instalação por site.
 - **Push.** O original usa Firebase Cloud Messaging; aqui há notificações em tempo real via Socket.io, Notification API do navegador e WhatsApp. FCM pode entrar depois como um canal a mais em `services/messaging.js`.

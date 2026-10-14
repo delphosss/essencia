@@ -18,6 +18,10 @@
     </div>
     <label class="field"><span>Apresentação</span><textarea class="input" name="bio" rows="12"><%= r.bio || '' %></textarea></label>
   </div>
+  <div class="row-2">
+    <label class="field"><span>Título para o Google (opcional)</span><input class="input" name="meta_title" maxlength="80" value="<%= r.meta_title || '' %>" placeholder="<%= r.display_name || 'Nome' %> — tarot online por chat"></label>
+    <label class="field"><span>Descrição para o Google (opcional)</span><input class="input" name="meta_description" maxlength="200" value="<%= r.meta_description || '' %>"></label>
+  </div>
   <fieldset class="fieldset"><legend>Especialidades</legend>
     <div class="check-grid"><% categories.forEach((c) => { %><label class="check"><input type="checkbox" name="categories" value="<%= c.id %>" <%= selected.includes(c.id) ? 'checked' : '' %>> <%= c.name %></label><% }) %></div>
   </fieldset>
@@ -33,13 +37,14 @@
     <label class="check"><input type="checkbox" name="questions_enabled" value="1" <%= r.questions_enabled ? 'checked' : '' %>> Perguntas pagas</label>
   </div>
   <div class="row-3">
-    <label class="field"><span>Repasse ao tarólogo (%)</span><input class="input" type="number" min="0" max="100" name="commission_percent" value="<%= r.commission_percent %>"></label>
+    <label class="field"><span>Repasse ao tarólogo (%) — o restante fica com o site</span><input class="input" type="number" min="0" max="100" name="commission_percent" value="<%= r.commission_percent %>"><small class="muted">Padrão: <%= settings.get('default_commission_percent') %>% tarólogo / <%= 100 - settings.get('default_commission_percent') %>% site</small></label>
     <label class="field"><span>WhatsApp (alertas)</span><input class="input" name="whatsapp" value="<%= r.whatsapp || '' %>"></label>
     <label class="field"><span>Chave Pix</span><input class="input" name="pix_key" value="<%= r.pix_key || '' %>"></label>
   </div>
   <div class="row-3">
     <label class="field"><span>Ordem na lista</span><input class="input" type="number" name="sort_order" value="<%= r.sort_order || 0 %>"></label>
     <label class="check"><input type="checkbox" name="featured" value="1" <%= r.featured ? 'checked' : '' %>> Destaque (Top 3 da home)</label>
+    <label class="check"><input type="checkbox" name="is_owner" value="1" <%= r.is_owner ? 'checked' : '' %>> Perfil da dona do site (100% fica com a casa, sem repasse)</label>
     <label class="check"><input type="checkbox" name="active" value="1" <%= r.active ? 'checked' : '' %>> Ativo no site</label>
   </div>
   <button class="btn btn-gold">Salvar</button>

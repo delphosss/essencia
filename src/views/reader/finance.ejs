@@ -9,6 +9,7 @@
 <div class="grid grid-2">
   <form method="post" action="/atendente/financeiro/saque" class="form card card-body">
     <h3>Solicitar saque</h3>
+    <% if (reader.is_owner) { %><div class="alert alert-info small">Este é o perfil da casa: 100% dos atendimentos ficam com o site e não há saque.</div><% } %>
     <p class="muted small">Seu repasse é de <strong><%= reader.commission_percent %>%</strong> do valor de cada consulta e pergunta. Saque mínimo: <%= money(minWithdrawal) %>. Pagamento por Pix após aprovação da administração.</p>
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <label class="field"><span>Valor (R$)</span><input class="input" name="amount" required inputmode="decimal" value="<%= centsToInput(summary.availableCents) %>"></label>
