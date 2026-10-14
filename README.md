@@ -26,6 +26,29 @@ Nome, logo e favicon ficam em **Admin → Configurações**. O logo atual foi re
 | SEO | Meta tags, canonical, Open Graph, JSON-LD (Organization, Person, BlogPosting, Product, FAQPage, BreadcrumbList), sitemap com imagens, RSS do blog e redirecionamentos 301 das URLs antigas |
 | E-mail / WhatsApp | SMTP (nodemailer) e uma API HTTP no estilo Z-API. Sem configuração, as mensagens só vão para o log |
 
+## Ver online (demonstração no Render)
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/delphosss/essencia)
+
+1. Clique no botão acima e entre no Render com a sua conta do GitHub.
+2. Preencha `ADMIN_EMAIL` e `ADMIN_PASSWORD`: é o login do admin. Use uma senha forte, porque o endereço fica público.
+3. Clique em **Apply**. Em cerca de 5 minutos o site fica no ar em `https://essencia-do-tarot.onrender.com` (ou num nome parecido, que o Render mostra).
+
+Como funciona a demonstração (`render.yaml`):
+
+- **Demo mode** (`DEMO_MODE=true`): pagamentos simulados, faixa de aviso no topo e site fora do Google, para não competir com o site atual.
+- **Plano gratuito:**
+  - O servidor "dorme" após 15 minutos sem acesso, e o primeiro acesso depois disso leva cerca de 50 s.
+  - O banco é recriado com os dados de exemplo a cada deploy ou reinício.
+- **Contas de teste:** `cliente@exemplo.com` / `cliente123` e `luna.arcana@exemplo.com` / `tarot123`.
+- **Senha da Dama da Noite:** é gerada pelo Render (variável `OWNER_PASSWORD`, no painel do serviço) e pode ser trocada em Admin → Tarólogos.
+
+**Produção de verdade:**
+
+- Use um plano com disco persistente (ou o `Dockerfile` numa VPS).
+- Remova `DEMO_MODE`.
+- Configure Mercado Pago, WhatsApp e e-mail, conforme [`docs/OPERACAO.md`](docs/OPERACAO.md).
+
 ## Rodando localmente
 
 ```bash

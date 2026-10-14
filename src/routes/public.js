@@ -309,6 +309,7 @@ ${posts.map((p) => `<item><title>${x(p.title)}</title><link>${config.baseUrl}/bl
 
   // ---- SEO -----------------------------------------------------------------
   router.get('/robots.txt', (req, res) => {
+    if (config.demoMode) return res.type('text/plain').send('User-agent: *\nDisallow: /\n');
     res.type('text/plain').send(['User-agent: *', 'Allow: /',
       ...['/admin', '/atendente', '/minha-conta', '/pagamento', '/sala', '/chamando', '/mensagens', '/carrinho', '/api/', '/auth/', '/*?busca='].map((p) => `Disallow: ${p}`),
       `Sitemap: ${config.baseUrl}/sitemap.xml`, ''].join('\n'));

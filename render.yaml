@@ -1,0 +1,32 @@
+# Render Blueprint: publica o site com um clique (https://render.com/deploy).
+# Plano gratuito = demonstração. O banco SQLite fica no disco temporário do servidor e é
+# recriado com os dados de exemplo a cada novo deploy ou reinício. Para produção, use um
+# plano pago com disco persistente (veja docs/OPERACAO.md).
+services:
+  - type: web
+    name: essencia-do-tarot
+    runtime: node
+    plan: free
+    region: oregon
+    branch: claude/zen-brahmagupta-hornbj
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /robots.txt
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: DEMO_MODE
+        value: "true"
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: OWNER_PASSWORD
+        generateValue: true
+      - key: DATABASE_PATH
+        value: ./data/essencia.db

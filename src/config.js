@@ -7,8 +7,11 @@ const env = process.env;
 module.exports = {
   root,
   port: Number(env.PORT || 3000),
-  baseUrl: (env.BASE_URL || `http://localhost:${env.PORT || 3000}`).replace(/\/$/, ''),
+  // No Render, RENDER_EXTERNAL_URL já traz o endereço público (https://...onrender.com).
+  baseUrl: (env.BASE_URL || env.RENDER_EXTERNAL_URL || `http://localhost:${env.PORT || 3000}`).replace(/\/$/, ''),
   isProduction: env.NODE_ENV === 'production',
+  // Ambiente de demonstração: pagamentos simulados, faixa de aviso e fora do Google.
+  demoMode: env.DEMO_MODE === 'true',
   sessionSecret: env.SESSION_SECRET || 'dev-secret-change-me',
   databasePath: env.DATABASE_PATH || path.join(root, 'data', 'essencia.db'),
   uploadDir: path.resolve(root, env.UPLOAD_DIR || 'public/uploads'),

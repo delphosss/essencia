@@ -8,7 +8,7 @@ const MP_API = 'https://api.mercadopago.com';
 //        → startPayment(método) → webhook/IPN confirma → markPaid credita a carteira.
 module.exports = function createPayments(ctx) {
   const { db, config, settings } = ctx;
-  const sandbox = () => !config.mercadoPago.accessToken && !config.isProduction;
+  const sandbox = () => !config.mercadoPago.accessToken && (!config.isProduction || config.demoMode);
 
   function hasPaidCreditOrder(userId) {
     return !!db.prepare("SELECT 1 FROM orders WHERE user_id = ? AND kind = 'credits' AND status = 'paid' LIMIT 1").get(userId);

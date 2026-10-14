@@ -453,3 +453,5 @@ select.input { appearance: auto; }
 .ql-editor { min-height: 260px; font-size: 1rem; }
 
 p a, .prose a, li a.inline-link { text-decoration: underline; text-underline-offset: 2px; }
+
+.demo-bar { background: #f3d58f; color: #2a1245; text-align: center; font-size: .82rem; font-weight: 800; padding: 6px 12px; }

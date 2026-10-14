@@ -1,5 +1,6 @@
 <%- include('head') %>
 <body class="admin">
+<% if (demoMode) { %><div class="demo-bar">Ambiente de demonstração — pagamentos simulados.</div><% } %>
 <div class="admin-shell">
   <aside class="admin-side" data-admin-side>
     <%- include('logo', { cls: 'logo-sm', href: '/admin' }) %>

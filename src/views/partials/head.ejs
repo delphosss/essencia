@@ -10,7 +10,7 @@
   <title><%= _title %></title>
   <meta name="description" content="<%= _desc %>">
   <link rel="canonical" href="<%= _canonical %>">
-  <% if (noindex) { %><meta name="robots" content="noindex, nofollow"><% } else { %><meta name="robots" content="index, follow, max-image-preview:large"><% } %>
+  <% if (noindex || demoMode) { %><meta name="robots" content="noindex, nofollow"><% } else { %><meta name="robots" content="index, follow, max-image-preview:large"><% } %>
   <meta property="og:site_name" content="<%= site.site_name %>">
   <meta property="og:locale" content="pt_BR">
   <meta property="og:type" content="<%= ogType %>">

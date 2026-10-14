@@ -84,6 +84,7 @@ function createApp(ctx) {
       ogType: 'website',
       canonical: null,
       noindex: PRIVATE.test(req.path),
+      demoMode: config.demoMode,
       flash,
       path: req.path,
       originalPath: req.originalUrl.split('?')[0].replace(/\/$/, '') || '/',

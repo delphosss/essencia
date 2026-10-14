@@ -1,5 +1,6 @@
 <%- include('head') %>
 <body class="<%= locals.bodyClass || '' %>">
+<% if (demoMode) { %><div class="demo-bar">Ambiente de demonstração — pagamentos simulados, nenhum valor é cobrado.</div><% } %>
 <header class="topbar">
   <div class="container topbar-inner">
     <%- include('logo') %>

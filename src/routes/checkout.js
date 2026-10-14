@@ -79,7 +79,7 @@ module.exports = function checkoutRoutes(ctx) {
   }));
 
   router.post('/pagamento/simulador/:id', requireAuth(), action(async (req, res) => {
-    if (!payments.sandbox() || config.isProduction) throw new HttpError(404, 'Indisponível');
+    if (!payments.sandbox()) throw new HttpError(404, 'Indisponível');
     const order = ownOrder(req);
     if (req.body.result === 'approve') payments.markPaid(order.id, { method: order.method || 'sandbox', gatewayRef: `sandbox-${order.id}` });
     else ctx.db.prepare("UPDATE orders SET status = 'failed' WHERE id = ? AND status = 'pending'").run(order.id);
